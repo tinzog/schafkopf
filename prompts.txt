@@ -1,0 +1,33 @@
+Schritt 1: Design
+
+Entwirf ein eigenes, modernes Kartendesign für ein bayerisches Schafkopf-Blatt
+und einen Spieltisch für eine Web-App.
+
+Karten:
+- Vier Farben: Eichel, Gras (Laub), Herz, Schellen. Zeichne die Farbsymbole
+  selbst als schlichte, flache Icons. Keine Vorlage bekannter Kartenverlage.
+- Werte: Ass (Sau), Zehn, König, Ober, Unter, Neun, Acht, Sieben.
+- Ober und Unter als stilisierte, freundliche Figuren, minimalistisch.
+- Gut lesbar auch klein, mit Wert in der Ecke.
+
+Spieltisch:
+- Draufsicht, grüner Filz oder ein dunkles Holz, vier Plätze.
+- Unten die eigene Hand (8 Karten fächerförmig), oben, links, rechts die
+  Gegner mit Namen, in der Mitte der aktuelle Stich.
+- Anzeige: Spielart, gerufene Sau, Punkte pro Team.
+
+Zeig mir zuerst die vier Farbsymbole und eine Beispielkarte pro Wert,
+dann den ganzen Tisch.
+
+
+Schritt 2: App
+
+Wir bauen eine Schafkopf-Web-App gegen drei Computergegner.
+Die Regeln stehen in Regeln.md, das Design liegt in design/.
+
+Technik: nur HTML, CSS und JavaScript in diesem Ordner, ohne Frameworks
+und ohne Build-Tools. Die App soll per Doppelklick auf index.html laufen.
+Zeichne die Karten selbst mit CSS oder SVG nach dem Design, keine
+Bilder aus dem Internet.
+
+Eine einzige index.html, kein Framework, keine Tests, kein Server.
