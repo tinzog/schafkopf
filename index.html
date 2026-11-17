@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Schafkopf</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div
+    class="l-app"
+    data-suit-names='{"eichel":"Eichel","gras":"Gras","herz":"Herz","schellen":"Schellen"}'
+    data-rank-names='{"A":"Sau","10":"Zehn","K":"König","O":"Ober","U":"Unter","9":"Neun","8":"Acht","7":"Sieben"}'
+    data-text-ace="{suit}-Sau"
+    data-text-team="{first} &amp; {second}"
+    data-text-team-self="Du"
+    data-text-team-others="Die anderen"
+    data-text-role-player="Spieler"
+    data-text-role-partner="Partner"
+    data-text-role-forehand="Vorhand"
+    data-text-role-turn="am Zug"
+    data-text-tricks-one="1 Stich"
+    data-text-tricks-many="{count} Stiche"
+    data-text-trick-counter="Stich {number} / 8"
+    data-text-trick-points="Im Stich: {points} Augen"
+    data-text-call-pending="Du rufst gleich eine Sau"
+    data-text-call-info="Du rufst die"
+    data-text-hint-lead="Du bist dran · Spiel eine Karte aus"
+    data-text-hint-follow="Du bist dran · {suit} ist angespielt, du musst {suit} zugeben"
+    data-text-hint-follow-trump="Du bist dran · Trumpf ist angespielt, du musst Trumpf zugeben"
+    data-text-hint-free="Du bist dran · Du kannst nicht bedienen, spiel eine beliebige Karte"
+    data-text-hint-waiting="{name} ist dran"
+    data-text-hint-trick-won="{name} macht den Stich · {points} Augen"
+    data-text-hint-trick-won-self="Du machst den Stich · {points} Augen"
+    data-text-redeal-one="Neu gegeben: Mit dem ersten Blatt konntest du keine Sau rufen."
+    data-text-redeal-many="Neu gegeben: {count}-mal konntest du keine Sau rufen."
+    data-text-result-won="Gewonnen!"
+    data-text-result-lost="Verloren"
+    data-text-result-row="{points} Augen · {tricks}"
+    data-text-result-partner="Dein Partner war {name}."
+>
+    <header class="l-app__header">
+        <div class="l-app__title">
+            <div class="l-app__eyebrow">Bayerisches Blatt · Sauspiel</div>
+            <h1 class="l-app__heading">Schafkopf</h1>
+        </div>
+        <div class="l-app__actions">
+            <div class="c-surface-switch" role="group" aria-label="Tischoberfläche">
+                <button type="button" class="c-surface-switch__option" data-surface="filz" aria-pressed="true">Filz</button>
+                <button type="button" class="c-surface-switch__option" data-surface="holz" aria-pressed="false">Holz</button>
+            </div>
+            <button type="button" class="c-button c-button--primary js-new-game">Neues Spiel</button>
+        </div>
+    </header>
+
+    <main class="c-table" aria-label="Spieltisch">
+        <div class="c-table__wood" aria-hidden="true"></div>
+
+        <section class="c-panel c-panel--info" aria-label="Spielart">
+            <div class="c-panel__eyebrow">Spielart</div>
+            <div class="c-panel__title">Sauspiel</div>
+            <div class="c-panel__call js-call-info"></div>
+        </section>
+
+        <section class="c-panel c-panel--score" aria-label="Punkte">
+            <div class="c-panel__eyebrow c-panel__eyebrow--split">
+                <span>Punkte</span><span class="js-trick-counter"></span>
+            </div>
+            <div class="c-score-row c-score-row--player">
+                <div class="c-score-row__line">
+                    <span class="js-team-player"></span><strong class="c-score-row__points js-points-player">0</strong>
+                </div>
+                <div class="c-score-row__bar"><div class="c-score-row__fill js-bar-player"></div></div>
+            </div>
+            <div class="c-score-row c-score-row--opponents">
+                <div class="c-score-row__line">
+                    <span class="js-team-opponents"></span><strong class="c-score-row__points js-points-opponents">0</strong>
+                </div>
+                <div class="c-score-row__bar"><div class="c-score-row__fill js-bar-opponents"></div></div>
+            </div>
+            <div class="c-panel__footer">
+                <span class="js-trick-points"></span><span>61 gewinnt</span>
+            </div>
+        </section>
+
+        <div class="c-opponent-hand c-opponent-hand--left js-opponent-hand" data-seat="1" aria-hidden="true"></div>
+        <div class="c-opponent-hand c-opponent-hand--top js-opponent-hand" data-seat="2" aria-hidden="true"></div>
+        <div class="c-opponent-hand c-opponent-hand--right js-opponent-hand" data-seat="3" aria-hidden="true"></div>
+
+        <div class="c-seat-badge c-seat-badge--bottom js-seat-badge" data-seat="0" data-name="Du">
+            <div class="c-seat-badge__avatar">D</div>
+            <div class="c-seat-badge__text">
+                <span class="c-seat-badge__name">Du</span><span class="c-seat-badge__status js-seat-status"></span>
+            </div>
+        </div>
+        <div class="c-seat-badge c-seat-badge--left js-seat-badge" data-seat="1" data-name="Sepp">
+            <div class="c-seat-badge__avatar">S</div>
+            <div class="c-seat-badge__text">
+                <span class="c-seat-badge__name">Sepp</span><span class="c-seat-badge__status js-seat-status"></span>
+            </div>
+        </div>
+        <div class="c-seat-badge c-seat-badge--top js-seat-badge" data-seat="2" data-name="Vroni">
+            <div class="c-seat-badge__avatar">V</div>
+            <div class="c-seat-badge__text">
+                <span class="c-seat-badge__name">Vroni</span><span class="c-seat-badge__status js-seat-status"></span>
+            </div>
+        </div>
+        <div class="c-seat-badge c-seat-badge--right js-seat-badge" data-seat="3" data-name="Resi">
+            <div class="c-seat-badge__avatar">R</div>
+            <div class="c-seat-badge__text">
+                <span class="c-seat-badge__name">Resi</span><span class="c-seat-badge__status js-seat-status"></span>
+            </div>
+        </div>
+
+        <div class="c-trick js-trick" aria-label="Aktueller Stich">
+            <div class="c-trick__slot js-trick-slot" aria-hidden="true"></div>
+        </div>
+
+        <div class="c-hint js-hint" role="status" aria-live="polite"></div>
+
+        <div class="c-hand js-hand" aria-label="Deine Karten"></div>
+
+        <section class="c-dialog js-call-dialog" aria-labelledby="call-title" hidden>
+            <h2 class="c-dialog__title" id="call-title">Welche Sau rufst du?</h2>
+            <p class="c-dialog__text">Wer die gerufene Sau hat, spielt heimlich mit dir.</p>
+            <p class="c-dialog__note js-redeal-note" hidden></p>
+            <div class="c-dialog__options js-call-options"></div>
+        </section>
+
+        <section class="c-dialog js-result-dialog" aria-labelledby="result-title" hidden>
+            <h2 class="c-dialog__title js-result-title" id="result-title"></h2>
+            <dl class="c-result">
+                <div class="c-result__row c-result__row--player">
+                    <dt class="js-result-team-player"></dt><dd class="js-result-player"></dd>
+                </div>
+                <div class="c-result__row">
+                    <dt class="js-result-team-opponents"></dt><dd class="js-result-opponents"></dd>
+                </div>
+            </dl>
+            <p class="c-dialog__text js-result-partner"></p>
+            <div class="c-dialog__options">
+                <button type="button" class="c-button c-button--primary js-new-game">Nochmal spielen</button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<template id="template-suit-eichel">
+    <svg class="c-suit" viewBox="0 0 100 100" aria-hidden="true">
+        <rect x="45" y="3" width="10" height="16" rx="4" fill="oklch(0.38 0.06 50)"/>
+        <path d="M27 46 L73 46 C73 72 62 90 50 97 C38 90 27 72 27 46Z" fill="oklch(0.66 0.1 62)"/>
+        <path d="M37 58 C37 70 41 80 47 87" stroke="oklch(0.98 0.01 85)" stroke-opacity="0.45" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M14 52 C14 29 30 15 50 15 C70 15 86 29 86 52 Z" fill="oklch(0.46 0.075 52)"/>
+        <circle cx="36" cy="36" r="3" fill="oklch(0.66 0.1 62)"/>
+        <circle cx="50" cy="28" r="3" fill="oklch(0.66 0.1 62)"/>
+        <circle cx="64" cy="36" r="3" fill="oklch(0.66 0.1 62)"/>
+        <circle cx="43" cy="44" r="3" fill="oklch(0.66 0.1 62)"/>
+        <circle cx="57" cy="44" r="3" fill="oklch(0.66 0.1 62)"/>
+    </svg>
+</template>
+<template id="template-suit-gras">
+    <svg class="c-suit" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M50 80 L50 96" stroke="oklch(0.45 0.12 145)" stroke-width="6" stroke-linecap="round"/>
+        <path d="M50 4 C74 22 86 44 74 64 C68 74 58 80 50 84 C42 80 32 74 26 64 C14 44 26 22 50 4Z" fill="oklch(0.56 0.14 145)"/>
+        <path d="M50 18 L50 80 M50 42 L36 31 M50 42 L64 31 M50 60 L33 49 M50 60 L67 49" stroke="oklch(0.98 0.01 85)" stroke-opacity="0.55" stroke-width="3" stroke-linecap="round" fill="none"/>
+    </svg>
+</template>
+<template id="template-suit-herz">
+    <svg class="c-suit" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M50 90 C20 68 5 50 5 32 C5 17 16 7 30 7 C40 7 46 13 50 21 C54 13 60 7 70 7 C84 7 95 17 95 32 C95 50 80 68 50 90Z" fill="oklch(0.57 0.2 25)"/>
+        <path d="M18 30 C19 23 24 18 31 17" stroke="oklch(0.98 0.01 85)" stroke-opacity="0.5" stroke-width="5" stroke-linecap="round" fill="none"/>
+    </svg>
+</template>
+<template id="template-suit-schellen">
+    <svg class="c-suit" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="11" r="6.5" fill="none" stroke="oklch(0.55 0.12 62)" stroke-width="4.5"/>
+        <circle cx="50" cy="55" r="38" fill="oklch(0.76 0.15 78)"/>
+        <rect x="12.5" y="40" width="75" height="7" fill="oklch(0.6 0.13 65)"/>
+        <path d="M31 71 L69 71" stroke="oklch(0.45 0.1 60)" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="31" cy="71" r="5.5" fill="oklch(0.45 0.1 60)"/>
+        <circle cx="69" cy="71" r="5.5" fill="oklch(0.45 0.1 60)"/>
+        <path d="M27 32 C31 26 37 22 44 21" stroke="oklch(0.98 0.01 85)" stroke-opacity="0.55" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+    </svg>
+</template>
+
+<template id="template-card">
+    <div class="c-card">
+        <div class="c-card__face">
+            <div class="c-card__content"></div>
+            <div class="c-card__corner c-card__corner--top">
+                <span class="c-card__label"></span><span class="c-card__corner-suit"></span>
+            </div>
+            <div class="c-card__corner c-card__corner--bottom">
+                <span class="c-card__label"></span><span class="c-card__corner-suit"></span>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="template-card-back">
+    <div class="c-card c-card--back">
+        <div class="c-card__face">
+            <div class="c-card__back-frame"></div>
+            <div class="c-card__back-medallion">
+                <span class="c-card__back-suit" data-suit="eichel"></span>
+                <span class="c-card__back-suit" data-suit="gras"></span>
+                <span class="c-card__back-suit" data-suit="herz"></span>
+                <span class="c-card__back-suit" data-suit="schellen"></span>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="template-card-ace">
+    <div class="c-card__ace-tint"></div>
+    <div class="c-card__ace-suit"></div>
+    <div class="c-card__ace-label">Sau</div>
+</template>
+
+<template id="template-card-figure">
+    <div class="c-card__figure-tint"></div>
+    <div class="c-card__figure">
+        <svg class="c-card__figure-svg" viewBox="0 0 100 120" aria-hidden="true">
+            <path class="c-figure__arm c-figure__arm--left" d="M34 73 L27 96"/>
+            <path class="c-figure__arm c-figure__arm--right" d="M66 73 L73 96"/>
+            <circle class="c-figure__skin c-figure__hand--left" cx="27" cy="98" r="4.2"/>
+            <circle class="c-figure__skin c-figure__hand--right" cx="73" cy="98" r="4.2"/>
+            <path class="c-figure__coat" d="M24 120 L30 71 Q50 61 70 71 L76 120 Z"/>
+            <rect class="c-figure__belt" x="27" y="93" width="46" height="5"/>
+            <circle class="c-figure__button" cx="50" cy="79" r="1.8"/>
+            <circle class="c-figure__button" cx="50" cy="86" r="1.8"/>
+            <circle class="c-figure__skin" cx="50" cy="51" r="13"/>
+            <circle class="c-figure__cheek" cx="43" cy="55.5" r="2.4"/>
+            <circle class="c-figure__cheek" cx="57" cy="55.5" r="2.4"/>
+            <circle class="c-figure__eye" cx="45.5" cy="50" r="1.5"/>
+            <circle class="c-figure__eye" cx="54.5" cy="50" r="1.5"/>
+            <path class="c-figure__mouth" d="M46 55.5 Q50 59 54 55.5"/>
+            <g class="c-figure__headwear" data-rank="K">
+                <path class="c-figure__beard" d="M39 59 Q50 72 61 59 Q57 64 50 64 Q43 64 39 59Z"/>
+                <path class="c-figure__crown" d="M37 41 L37 28 L43.5 34 L50 25 L56.5 34 L63 28 L63 41 Z"/>
+            </g>
+            <g class="c-figure__headwear" data-rank="O">
+                <path class="c-figure__feather" d="M42 29 Q31 20 28 10 Q37 17 44 27Z"/>
+                <path class="c-figure__hat" d="M40 40 L42 28 Q50 25 58 28 L60 40Z"/>
+                <rect class="c-figure__hat" x="31" y="38" width="38" height="4" rx="2"/>
+            </g>
+            <g class="c-figure__headwear" data-rank="U">
+                <path class="c-figure__hat" d="M36 45 Q36 31 50 31 Q65 31 65 43 Q58 39 50 40 Q42 40 36 45Z"/>
+                <circle class="c-figure__hat" cx="50" cy="30" r="2.6"/>
+            </g>
+        </svg>
+        <div class="c-card__held"></div>
+    </div>
+</template>
+
+<template id="template-call-option">
+    <button type="button" class="c-call-option">
+        <span class="c-call-option__suit"></span>
+        <span class="c-call-option__label"></span>
+    </button>
+</template>
+
+<script src="js/signal.js"></script>
+<script src="js/cards.js"></script>
+<script src="js/rules.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/render.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

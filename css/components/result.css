@@ -1,0 +1,29 @@
+.c-result {
+    display: flex;
+    flex-direction: column;
+    gap: max(var(--space-1), 0.5cqw);
+    margin: 0;
+}
+
+.c-result__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-4);
+    border-radius: max(var(--space-2), 0.8cqw);
+    padding: max(var(--space-2), 0.8cqw) max(var(--space-3), 1.2cqw);
+    background: var(--color-surface-dialog-row);
+    font-size: max(var(--font-size-sm), 1.25cqw);
+}
+
+.c-result__row--player {
+    background: var(--color-surface-accent-subtle);
+}
+
+.c-result__row dt {
+    font-weight: var(--font-weight-medium);
+}
+
+.c-result__row dd {
+    margin: 0;
+}

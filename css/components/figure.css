@@ -1,0 +1,51 @@
+.c-figure__arm {
+    fill: none;
+    stroke: var(--card-main);
+    stroke-width: 7;
+    stroke-linecap: round;
+}
+
+.c-figure__skin {
+    fill: var(--color-figure-skin);
+}
+
+.c-figure__coat,
+.c-figure__feather {
+    fill: var(--card-main);
+}
+
+.c-figure__belt {
+    fill: var(--color-figure-belt);
+}
+
+.c-figure__button {
+    fill: var(--color-surface-card);
+}
+
+.c-figure__cheek {
+    fill: var(--color-figure-cheek);
+    fill-opacity: 0.45;
+}
+
+.c-figure__eye {
+    fill: var(--color-figure-line);
+}
+
+.c-figure__mouth {
+    fill: none;
+    stroke: var(--color-figure-line);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+}
+
+.c-figure__beard {
+    fill: var(--color-figure-beard);
+}
+
+.c-figure__crown {
+    fill: var(--color-figure-crown);
+}
+
+.c-figure__hat {
+    fill: var(--color-figure-hat);
+}

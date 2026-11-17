@@ -1,0 +1,40 @@
+/* All sizes inside the table scale with its width (cqw), exactly like the design's 16:10 table. */
+.c-table {
+    position: relative;
+    align-self: center;
+    inline-size: min(100%, max(20rem, calc((100dvh - 9rem) * 1.6)));
+    aspect-ratio: 16 / 10;
+    container-type: inline-size;
+    overflow: hidden;
+    isolation: isolate;
+    border-radius: 28px;
+    background: radial-gradient(
+        ellipse 70% 65% at 50% 45%,
+        var(--color-table-felt-light),
+        var(--color-table-felt-dark)
+    );
+    box-shadow: inset 0 0 0 10px var(--color-table-rim), inset 0 0 60px oklch(0.1 0.02 60 / 0.35);
+    color: var(--color-text-on-table);
+    line-height: var(--leading-snug);
+}
+
+.c-table__wood {
+    position: absolute;
+    inset: 0;
+    display: none;
+    background-color: var(--color-table-wood-base);
+    background-image:
+        repeating-linear-gradient(
+            91deg,
+            var(--color-table-wood-grain-dark) 0 2px,
+            transparent 2px 9px,
+            var(--color-table-wood-grain-light) 9px 11px,
+            transparent 11px 23px
+        ),
+        radial-gradient(ellipse 70% 65% at 50% 45%, var(--color-table-wood-light), var(--color-table-wood-dark));
+    box-shadow: inset 0 0 70px oklch(0.1 0.02 60 / 0.45);
+}
+
+.c-table[data-surface='holz'] .c-table__wood {
+    display: block;
+}

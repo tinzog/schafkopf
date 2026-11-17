@@ -1,0 +1,27 @@
+.c-surface-switch {
+    display: inline-flex;
+    gap: var(--space-1);
+    padding: var(--space-1);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-control);
+}
+
+.c-surface-switch__option {
+    border: 0;
+    border-radius: var(--radius-pill);
+    padding: var(--space-1) var(--space-4);
+    background: transparent;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+}
+
+.c-surface-switch__option[aria-pressed='true'] {
+    background: var(--color-surface-control-selected);
+    box-shadow: var(--shadow-raised);
+    font-weight: var(--font-weight-medium);
+}
+
+.c-surface-switch__option:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+}

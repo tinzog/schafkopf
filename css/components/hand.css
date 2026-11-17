@@ -1,0 +1,51 @@
+.c-hand {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* The far-away transform origin turns the plain rotation into the design's fan. */
+.c-hand__card {
+    --lift: 0cqw;
+
+    position: absolute;
+    inset-block-end: -3.5cqw;
+    inset-inline-start: 50%;
+    inline-size: 9cqw;
+    block-size: 14.4cqw;
+    border: 0;
+    border-radius: 0.63cqw;
+    padding: 0;
+    background: none;
+    transform-origin: 50% 420%;
+    transform: translateX(-50%) rotate(var(--fan-angle, 0deg)) translateY(var(--lift));
+    transition: transform var(--duration-fast) var(--ease-out);
+    pointer-events: auto;
+}
+
+.c-hand__card.is-playable {
+    --lift: -2.6cqw;
+
+    cursor: pointer;
+}
+
+.c-hand__card:focus-visible {
+    --lift: -4cqw;
+
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+    transition: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .c-hand__card.is-playable:hover {
+        --lift: -4cqw;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .c-hand__card {
+        transition: none;
+    }
+}

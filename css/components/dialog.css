@@ -1,0 +1,76 @@
+/* Sits above the trick area without a backdrop, so the hand stays visible while calling. */
+.c-dialog {
+    position: absolute;
+    inset-block-start: 42%;
+    inset-inline-start: 50%;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: max(var(--space-2), 1cqw);
+    inline-size: min(92cqw, max(18.75rem, 40cqw));
+    translate: -50% -50%;
+    border-radius: max(1rem, 2cqw);
+    padding: max(var(--space-4), 2.4cqw);
+    background: var(--color-surface-dialog);
+    box-shadow: var(--shadow-dialog);
+    color: var(--color-text-dialog);
+    text-align: center;
+    animation: dialog-in var(--duration-medium) var(--ease-out);
+}
+
+.c-dialog__title {
+    margin: 0;
+    font-size: max(var(--font-size-lg), 2.4cqw);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.02em;
+    line-height: var(--leading-snug);
+}
+
+.c-dialog.is-won .c-dialog__title {
+    color: var(--color-status-success);
+}
+
+.c-dialog:not(.is-won) .js-result-title {
+    color: var(--color-status-error);
+}
+
+.c-dialog__text {
+    margin: 0;
+    font-size: max(var(--font-size-sm), 1.2cqw);
+    opacity: 0.7;
+}
+
+.c-dialog__note {
+    margin: 0;
+    border-radius: max(var(--space-2), 0.8cqw);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-surface-accent-subtle);
+    font-size: max(var(--font-size-xs), 1.05cqw);
+}
+
+.c-dialog__options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: max(var(--space-2), 1cqw);
+    margin-block-start: max(var(--space-1), 0.6cqw);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .c-dialog {
+        animation-name: dialog-fade-in;
+    }
+}
+
+@keyframes dialog-in {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+}
+
+@keyframes dialog-fade-in {
+    from {
+        opacity: 0;
+    }
+}

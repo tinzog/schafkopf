@@ -1,0 +1,57 @@
+.c-score-row {
+    --score-row-fill: var(--color-table-track-neutral);
+    --score-row-marker: var(--color-table-track-neutral);
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.4cqw;
+}
+
+.c-score-row--player {
+    --score-row-fill: var(--color-surface-accent);
+    --score-row-marker: var(--color-surface-accent);
+}
+
+.c-score-row__line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    font-size: max(0.75rem, 1.25cqw);
+}
+
+.c-score-row__points {
+    font-size: max(1rem, 2cqw);
+}
+
+.c-score-row__bar {
+    position: relative;
+    block-size: max(4px, 0.4cqw);
+    border-radius: var(--radius-pill);
+    background: var(--color-table-track);
+}
+
+.c-score-row__bar::after {
+    content: '';
+    position: absolute;
+    inset-block: -0.3cqw;
+    inset-inline-start: calc(var(--winning-share) * 100%);
+    inline-size: 2px;
+    background: var(--score-row-marker);
+}
+
+.c-score-row__fill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--score-row-fill);
+    transform: scaleX(var(--share, 0));
+    transform-origin: left center;
+    transition: transform var(--duration-medium) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .c-score-row__fill {
+        transition: none;
+    }
+}

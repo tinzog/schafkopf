@@ -1,0 +1,106 @@
+.c-trick {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.c-trick__slot,
+.c-trick__card {
+    position: absolute;
+    inline-size: 8cqw;
+    block-size: 12.8cqw;
+    translate: -50% -50%;
+}
+
+.c-trick__slot {
+    inset-block-start: 58%;
+    inset-inline-start: 50%;
+    border: 2px dashed var(--color-table-slot-border);
+    border-radius: 0.6cqw;
+}
+
+.c-trick__card {
+    animation: trick-card-in var(--duration-medium) var(--ease-out) backwards;
+    transition:
+        transform var(--duration-collect) var(--ease-in-out),
+        opacity var(--duration-collect) var(--ease-in-out);
+}
+
+.c-trick__card--top {
+    --enter-x: 0;
+    --enter-y: -14cqw;
+
+    inset-block-start: 38%;
+    inset-inline-start: 50%;
+    rotate: 4deg;
+}
+
+.c-trick__card--left {
+    --enter-x: -16cqw;
+    --enter-y: 0;
+
+    inset-block-start: 48%;
+    inset-inline-start: 43%;
+    rotate: -9deg;
+}
+
+.c-trick__card--right {
+    --enter-x: 16cqw;
+    --enter-y: 0;
+
+    inset-block-start: 48%;
+    inset-inline-start: 57%;
+    rotate: 11deg;
+}
+
+.c-trick__card--bottom {
+    --enter-x: 0;
+    --enter-y: 14cqw;
+
+    inset-block-start: 58%;
+    inset-inline-start: 50%;
+}
+
+.c-trick[data-collect] .c-trick__card {
+    opacity: 0;
+    transform: translate(var(--collect-x), var(--collect-y)) scale(0.6);
+}
+
+.c-trick[data-collect='top'] {
+    --collect-x: 0;
+    --collect-y: -28cqw;
+}
+
+.c-trick[data-collect='left'] {
+    --collect-x: -36cqw;
+    --collect-y: 0;
+}
+
+.c-trick[data-collect='right'] {
+    --collect-x: 36cqw;
+    --collect-y: 0;
+}
+
+.c-trick[data-collect='bottom'] {
+    --collect-x: 0;
+    --collect-y: 28cqw;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .c-trick .c-trick__card {
+        --enter-x: 0;
+        --enter-y: 0;
+    }
+
+    .c-trick[data-collect] .c-trick__card {
+        transform: none;
+    }
+}
+
+@keyframes trick-card-in {
+    from {
+        opacity: 0;
+        transform: translate(var(--enter-x), var(--enter-y));
+    }
+}

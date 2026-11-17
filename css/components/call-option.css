@@ -1,0 +1,40 @@
+.c-call-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: max(var(--space-1), 0.6cqw);
+    min-inline-size: max(6rem, 10cqw);
+    border: 2px solid transparent;
+    border-radius: max(0.75rem, 1.4cqw);
+    padding: max(var(--space-3), 1.2cqw) max(var(--space-4), 1.6cqw);
+    background: var(--color-surface-card);
+    box-shadow: var(--shadow-raised);
+    font-size: max(var(--font-size-sm), 1.2cqw);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition:
+        transform var(--duration-fast) var(--ease-out),
+        border-color var(--duration-fast) var(--ease-out);
+}
+
+.c-call-option:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+}
+
+.c-call-option:active {
+    transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .c-call-option:hover {
+        border-color: var(--color-surface-accent);
+        transform: translateY(-2px);
+    }
+}
+
+.c-call-option__suit {
+    display: block;
+    inline-size: max(2.25rem, 4.5cqw);
+    block-size: max(2.25rem, 4.5cqw);
+}

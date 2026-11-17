@@ -1,0 +1,21 @@
+@layer settings, generic, layout, components;
+
+@import url('settings.css') layer(settings);
+@import url('generic.css') layer(generic);
+@import url('layout/app.css') layer(layout);
+@import url('components/button.css') layer(components);
+@import url('components/surface-switch.css') layer(components);
+@import url('components/table.css') layer(components);
+@import url('components/panel.css') layer(components);
+@import url('components/score-row.css') layer(components);
+@import url('components/seat-badge.css') layer(components);
+@import url('components/opponent-hand.css') layer(components);
+@import url('components/trick.css') layer(components);
+@import url('components/hint.css') layer(components);
+@import url('components/hand.css') layer(components);
+@import url('components/suit.css') layer(components);
+@import url('components/card.css') layer(components);
+@import url('components/figure.css') layer(components);
+@import url('components/dialog.css') layer(components);
+@import url('components/call-option.css') layer(components);
+@import url('components/result.css') layer(components);

@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schafkopf – Demo</title>
+<style>
+  :root {
+    --felt1: #2f6b45; --felt2: #1d4a30; --cream: #FBF6EA; --ink: #1d1f24;
+    --gold: #E2A72E; --red: #C8372D; --green: #3E8E41; --brown: #7A4B24;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(ellipse at center, var(--felt1) 0%, var(--felt2) 75%, #133322 100%);
+    color: #F4EFE3; overflow: hidden; user-select: none;
+  }
+  #table { position: relative; width: 100vw; height: 100vh; min-height: 640px; }
+  header {
+    position: absolute; top: 12px; left: 16px; right: 16px; display: flex;
+    justify-content: space-between; align-items: center; gap: 16px; z-index: 5;
+  }
+  header h1 { font-size: 20px; margin: 0; letter-spacing: .5px; font-weight: 700; }
+  header .info { font-size: 15px; opacity: .9; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .badge { background: rgba(0,0,0,.25); padding: 6px 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; }
+  .badge svg { width: 18px; height: 18px; }
+  button {
+    font: inherit; font-weight: 600; border: 0; border-radius: 10px; padding: 10px 16px;
+    background: var(--gold); color: var(--ink); cursor: pointer;
+  }
+  button:hover { filter: brightness(1.08); }
+  button.ghost { background: rgba(255,255,255,.15); color: #fff; }
+
+  /* Mitspieler */
+  .seat { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .seat .name { font-weight: 700; font-size: 16px; background: rgba(0,0,0,.25); padding: 4px 12px; border-radius: 999px; }
+  .seat .name.partner { background: var(--gold); color: var(--ink); }
+  .seat .name.active { outline: 2px solid #fff; }
+  .seat .pts { font-size: 13px; opacity: .85; }
+  .backs { display: flex; }
+  .back {
+    width: 34px; height: 52px; border-radius: 5px; margin-left: -18px;
+    background: repeating-linear-gradient(45deg, #8E2F25 0 4px, #A93B2F 4px 8px);
+    border: 2px solid var(--cream); box-shadow: 0 2px 4px rgba(0,0,0,.3);
+  }
+  .back:first-child { margin-left: 0; }
+  #seat1 { left: 24px; top: 50%; transform: translateY(-50%); }
+  #seat2 { top: 64px; left: 50%; transform: translateX(-50%); }
+  #seat3 { right: 24px; top: 50%; transform: translateY(-50%); }
+
+  /* Stich in der Mitte */
+  #trick { position: absolute; left: 50%; top: 46%; width: 300px; height: 260px; transform: translate(-50%,-50%); }
+  #trick .card { position: absolute; transition: transform .35s ease, opacity .35s ease; }
+  #trick .p0 { left: 102px; top: 120px; }
+  #trick .p1 { left: 10px; top: 55px; transform: rotate(-8deg); }
+  #trick .p2 { left: 102px; top: -5px; }
+  #trick .p3 { left: 194px; top: 55px; transform: rotate(8deg); }
+
+  /* Eigene Hand */
+  #hand { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; gap: 0; padding: 0 20px; }
+  #hand .card { margin-left: -22px; cursor: pointer; transition: transform .15s ease, filter .15s ease; }
+  #hand .card:first-child { margin-left: 0; }
+  #hand .card.legal:hover { transform: translateY(-18px); }
+  #hand .card.illegal { filter: brightness(.55) saturate(.6); cursor: not-allowed; }
+  #me { position: absolute; bottom: 184px; left: 50%; transform: translateX(-50%); }
+
+  /* Karte */
+  .card {
+    width: 96px; height: 146px; border-radius: 10px; background: var(--cream); color: var(--ink);
+    box-shadow: 0 4px 10px rgba(0,0,0,.35); position: relative; border: 1px solid #d8ceb8;
+  }
+  .card .corner { position: absolute; top: 6px; left: 7px; display: flex; flex-direction: column; align-items: center; line-height: 1; }
+  .card .corner b { font-size: 18px; font-weight: 800; }
+  .card .corner svg { width: 16px; height: 16px; margin-top: 2px; }
+  .card .corner.br { top: auto; left: auto; bottom: 6px; right: 7px; transform: rotate(180deg); }
+  .card .face { position: absolute; inset: 26px 14px; display: flex; align-items: center; justify-content: center; }
+  .card .face svg { width: 100%; height: 100%; }
+  .card.trumpf::after {
+    content: ""; position: absolute; inset: 3px; border-radius: 8px; border: 2px solid rgba(226,167,46,.75); pointer-events: none;
+  }
+
+  /* Meldungen */
+  #msg {
+    position: absolute; left: 50%; top: 72%; transform: translate(-50%,-50%);
+    background: rgba(0,0,0,.45); padding: 10px 18px; border-radius: 12px; font-size: 16px; text-align: center; max-width: 80vw;
+  }
+  #overlay {
+    position: absolute; inset: 0; background: rgba(10,25,16,.72); display: flex; align-items: center; justify-content: center; z-index: 10;
+  }
+  #overlay.hidden { display: none; }
+  .panel {
+    background: var(--cream); color: var(--ink); border-radius: 18px; padding: 28px 32px; width: min(560px, 92vw);
+    box-shadow: 0 20px 50px rgba(0,0,0,.4); text-align: center;
+  }
+  .panel h2 { margin: 0 0 8px; font-size: 26px; }
+  .panel p { margin: 6px 0 16px; color: #4a4f5a; }
+  .panel .choices { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+  .panel .choices button { display: inline-flex; align-items: center; gap: 8px; }
+  .panel .choices svg { width: 22px; height: 22px; }
+  .panel .preview { display: flex; justify-content: center; margin: 12px 0 4px; }
+  .panel .preview .card { width: 60px; height: 92px; margin-left: -14px; }
+  .panel .preview .card:first-child { margin-left: 0; }
+  .panel .preview .card .corner b { font-size: 13px; }
+  .panel .preview .card .corner svg { width: 11px; height: 11px; }
+  .panel .preview .card .corner.br { display: none; }
+  .panel .preview .card .face { inset: 22px 8px 8px; }
+  .score { font-size: 40px; font-weight: 800; margin: 8px 0; }
+  .note { font-size: 12px; opacity: .7; position: absolute; bottom: 6px; right: 12px; }
+</style>
+</head>
+<body>
+<div id="table">
+  <header>
+    <h1>Schafkopf · Sauspiel</h1>
+    <div class="info"><span id="called" class="badge">Noch nichts gerufen</span><span id="trickNo" class="badge">Stich 0/8</span><button class="ghost" id="newBtn">Neu geben</button></div>
+  </header>
+  <div class="seat" id="seat1"><div class="name" id="n1">Sepp</div><div class="backs" id="b1"></div><div class="pts" id="p1"></div></div>
+  <div class="seat" id="seat2"><div class="name" id="n2">Vroni</div><div class="backs" id="b2"></div><div class="pts" id="p2"></div></div>
+  <div class="seat" id="seat3"><div class="name" id="n3">Wastl</div><div class="backs" id="b3"></div><div class="pts" id="p3"></div></div>
+  <div class="seat" id="me"><div class="name" id="n0">Du</div><div class="pts" id="p0"></div></div>
+  <div id="trick"></div>
+  <div id="msg">Willkommen am Tisch!</div>
+  <div id="hand"></div>
+  <div id="overlay"></div>
+  <div class="note">Demo-Version mit vereinfachten Regeln · eigenes Kartendesign</div>
+</div>
+
+<script>
+// ---------- Farbsymbole (selbst gezeichnet) ----------
+const ICON = {
+  E: `<svg viewBox="0 0 100 100" aria-label="Eichel"><rect x="46" y="4" width="8" height="16" rx="3" fill="#5A3518"/><path d="M14 40 Q50 6 86 40 Q86 48 80 48 L20 48 Q14 48 14 40Z" fill="#7A4B24"/><path d="M24 38 L36 26 M38 38 L50 24 M52 38 L64 24 M66 38 L76 30" stroke="#5A3518" stroke-width="3" stroke-linecap="round"/><path d="M24 48 Q24 92 50 96 Q76 92 76 48Z" fill="#C9933A"/><path d="M36 58 Q38 80 50 88" stroke="#E7BE6E" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`,
+  G: `<svg viewBox="0 0 100 100" aria-label="Gras"><path d="M50 96 L50 80" stroke="#2C6B30" stroke-width="6" stroke-linecap="round"/><path d="M50 82 C14 70 10 34 50 4 C90 34 86 70 50 82Z" fill="#3E8E41"/><path d="M50 78 L50 16 M50 60 L32 46 M50 60 L68 46 M50 40 L36 30 M50 40 L64 30" stroke="#BFE3B5" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>`,
+  H: `<svg viewBox="0 0 100 100" aria-label="Herz"><path d="M50 90 C14 64 4 44 10 28 C16 12 40 8 50 28 C60 8 84 12 90 28 C96 44 86 64 50 90Z" fill="#C8372D"/><path d="M24 30 C26 22 34 18 40 22" stroke="#F2A49B" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`,
+  S: `<svg viewBox="0 0 100 100" aria-label="Schellen"><circle cx="50" cy="12" r="7" fill="none" stroke="#9A6A12" stroke-width="5"/><circle cx="50" cy="56" r="38" fill="#E2A72E"/><path d="M14 50 Q50 40 86 50 L86 60 Q50 50 14 60Z" fill="#C8372D"/><circle cx="50" cy="74" r="7" fill="#5C3D08"/><path d="M50 74 L50 92" stroke="#5C3D08" stroke-width="5" stroke-linecap="round"/><circle cx="36" cy="36" r="6" fill="#F6D58A"/></svg>`
+};
+const SUITS = ['E','G','H','S'];
+const SUITNAME = {E:'Eichel', G:'Gras', H:'Herz', S:'Schellen'};
+const RANKS = ['A','10','K','O','U','9','8','7'];
+const RANKNAME = {A:'Sau','10':'Zehner',K:'König',O:'Ober',U:'Unter','9':'Neuner','8':'Achter','7':'Siebener'};
+const POINTS = {A:11,'10':10,K:4,O:3,U:2,'9':0,'8':0,'7':0};
+const NAMES = ['Du','Sepp','Vroni','Wastl'];
+
+// Figur für Ober und Unter: selbst gestaltet, schlicht
+function figure(rank, suit) {
+  const hat = rank === 'O' ? '#2D3A6B' : '#6B2D3A';
+  const pos = rank === 'O' ? 'translate(58 6) scale(.36)' : 'translate(58 66) scale(.36)';
+  return `<svg viewBox="0 0 100 100">
+    <circle cx="40" cy="${rank==='O'?30:44}" r="14" fill="#F2D2B0"/>
+    <path d="M24 ${rank==='O'?22:36} Q40 ${rank==='O'?2:16} 56 ${rank==='O'?22:36}Z" fill="${hat}"/>
+    <path d="M18 98 Q20 ${rank==='O'?50:64} 40 ${rank==='O'?48:62} Q60 ${rank==='O'?50:64} 62 98Z" fill="${hat}"/>
+    <path d="M40 ${rank==='O'?50:64} L40 98" stroke="#F4EFE3" stroke-width="4"/>
+    <g transform="${pos}">${ICON[suit].replace(/<\/?svg[^>]*>/g,'')}</g>
+  </svg>`;
+}
+function faceSvg(c) {
+  if (c.rank === 'O' || c.rank === 'U') return figure(c.rank, c.suit);
+  const inner = ICON[c.suit].replace(/<\/?svg[^>]*>/g,'');
+  const n = {A:1,'10':4,K:2,'9':3,'8':2,'7':1}[c.rank];
+  const spots = {1:[[25,25,50]],2:[[30,8,40],[30,52,40]],3:[[32,2,34],[32,34,34],[32,66,34]],4:[[8,8,38],[54,8,38],[8,54,38],[54,54,38]]}[n];
+  let crown = c.rank === 'K' ? `<path d="M30 2 L38 14 L50 0 L62 14 L70 2 L70 10 L30 10Z" fill="#E2A72E"/>` : '';
+  if (c.rank === 'A') return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#E2A72E" stroke-width="3" stroke-dasharray="4 6"/>${spots.map(([x,y,s])=>`<g transform="translate(${x} ${y}) scale(${s/100})">${inner}</g>`).join('')}</svg>`;
+  return `<svg viewBox="0 0 100 100">${crown}${spots.map(([x,y,s])=>`<g transform="translate(${x} ${y}) scale(${s/100})">${inner}</g>`).join('')}</svg>`;
+}
+function cardEl(c) {
+  const d = document.createElement('div');
+  d.className = 'card' + (isTrump(c) ? ' trumpf' : '');
+  d.title = `${SUITNAME[c.suit]}-${RANKNAME[c.rank]}`;
+  const corner = `<b>${c.rank}</b>${ICON[c.suit]}`;
+  d.innerHTML = `<div class="corner">${corner}</div><div class="face">${faceSvg(c)}</div><div class="corner br">${corner}</div>`;
+  return d;
+}
+
+// ---------- Regeln ----------
+const isTrump = c => c.rank === 'O' || c.rank === 'U' || c.suit === 'H';
+const colorOf = c => isTrump(c) ? 'T' : c.suit;
+function trumpRank(c) { // höher = stärker
+  const so = {E:3,G:2,H:1,S:0};
+  if (c.rank === 'O') return 100 + so[c.suit];
+  if (c.rank === 'U') return 80 + so[c.suit];
+  return 60 + {A:6,'10':5,K:4,'9':3,'8':2,'7':1}[c.rank];
+}
+const plainRank = c => ({A:6,'10':5,K:4,'9':3,'8':2,'7':1}[c.rank]);
+const strength = c => isTrump(c) ? trumpRank(c) : plainRank(c);
+
+function trickWinner(trick) { // trick: [{p, c}]
+  const led = colorOf(trick[0].c);
+  let best = trick[0];
+  for (const t of trick.slice(1)) {
+    if (isTrump(t.c)) { if (!isTrump(best.c) || trumpRank(t.c) > trumpRank(best.c)) best = t; }
+    else if (!isTrump(best.c) && t.c.suit === led && plainRank(t.c) > plainRank(best.c)) best = t;
+  }
+  return best.p;
+}
+const isCalledAce = c => game.calledSuit && c.suit === game.calledSuit && c.rank === 'A';
+
+function legalCards(p) {
+  const hand = game.hands[p];
+  if (game.trick.length === 0) {
+    // Partner muss die gerufene Farbe mit der Sau anspielen
+    const hasAce = hand.some(isCalledAce);
+    if (hasAce) {
+      const opts = hand.filter(c => !(colorOf(c) === game.calledSuit && !isCalledAce(c)));
+      return opts.length ? opts : hand;
+    }
+    return hand;
+  }
+  const led = colorOf(game.trick[0].c);
+  const follow = hand.filter(c => colorOf(c) === led);
+  if (follow.length) {
+    if (led === game.calledSuit && follow.some(isCalledAce)) return follow.filter(isCalledAce);
+    return follow;
+  }
+  // Gerufene Sau darf nicht abgeworfen werden (außer im letzten Stich)
+  const noAce = hand.filter(c => !isCalledAce(c));
+  return (noAce.length && hand.length > 1) ? noAce : hand;
+}
+
+// ---------- Spielzustand ----------
+let game;
+function newDeck() { const d = []; for (const s of SUITS) for (const r of RANKS) d.push({suit:s, rank:r}); return d; }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function sortHand(h) {
+  const so = {E:0,G:1,S:2};
+  return h.sort((a,b) => {
+    const ta = isTrump(a), tb = isTrump(b);
+    if (ta && tb) return trumpRank(b) - trumpRank(a);
+    if (ta) return -1; if (tb) return 1;
+    if (a.suit !== b.suit) return so[a.suit] - so[b.suit];
+    return plainRank(b) - plainRank(a);
+  });
+}
+function callableSuits(hand) {
+  return ['E','G','S'].filter(s => hand.some(c => c.suit === s && !isTrump(c)) && !hand.some(c => c.suit === s && c.rank === 'A'));
+}
+
+function deal() {
+  let deck, hands;
+  for (let tries = 0; tries < 50; tries++) {
+    deck = shuffle(newDeck());
+    hands = [0,1,2,3].map(i => sortHand(deck.slice(i*8, i*8+8)));
+    if (callableSuits(hands[0]).length) break;
+  }
+  game = { hands, trick: [], tricksDone: 0, taken: [0,0,0,0], leader: 1, turn: 1, calledSuit: null, partner: null, revealed: false, busy: false };
+  render();
+  showCallDialog();
+}
+
+function showCallDialog() {
+  const ov = document.getElementById('overlay');
+  const suits = callableSuits(game.hands[0]);
+  const prev = document.createElement('div'); prev.className = 'preview';
+  game.hands[0].forEach(c => prev.appendChild(cardEl(c)));
+  ov.innerHTML = `<div class="panel"><h2>Du spielst ein Sauspiel</h2><p>Welche Sau rufst du? Wer sie hat, spielt heimlich mit dir.</p><div class="slot"></div><div class="choices">${suits.map(s => `<button data-s="${s}">${ICON[s]} ${SUITNAME[s]}-Sau</button>`).join('')}</div></div>`;
+  ov.querySelector('.slot').appendChild(prev);
+  ov.classList.remove('hidden');
+  ov.querySelectorAll('button').forEach(b => b.onclick = () => {
+    game.calledSuit = b.dataset.s;
+    game.partner = [1,2,3].find(p => game.hands[p].some(c => c.suit === game.calledSuit && c.rank === 'A'));
+    ov.classList.add('hidden');
+    document.getElementById('called').innerHTML = `Gerufen: ${ICON[game.calledSuit]} ${SUITNAME[game.calledSuit]}-Sau`;
+    say(`${NAMES[game.leader]} spielt aus.`);
+    render();
+    setTimeout(nextTurn, 700);
+  });
+}
+
+function say(t) { document.getElementById('msg').textContent = t; }
+
+function render() {
+  const hand = document.getElementById('hand'); hand.innerHTML = '';
+  const legal = (game.turn === 0 && !game.busy && game.calledSuit) ? legalCards(0) : [];
+  game.hands[0].forEach(c => {
+    const el = cardEl(c);
+    const ok = legal.includes(c);
+    el.classList.add(ok ? 'legal' : (game.turn === 0 && game.calledSuit && !game.busy ? 'illegal' : 'legal'));
+    if (ok) el.onclick = () => play(0, c);
+    hand.appendChild(el);
+  });
+  for (const p of [1,2,3]) {
+    const b = document.getElementById('b' + p); b.innerHTML = '';
+    game.hands[p].forEach(() => { const d = document.createElement('div'); d.className = 'back'; b.appendChild(d); });
+    const n = document.getElementById('n' + p);
+    n.classList.toggle('partner', game.revealed && p === game.partner);
+  }
+  for (const p of [0,1,2,3]) {
+    document.getElementById('n' + p).classList.toggle('active', game.turn === p && !game.busy && !!game.calledSuit);
+    document.getElementById('p' + p).textContent = `${game.taken[p]} Augen`;
+  }
+  const tr = document.getElementById('trick'); tr.innerHTML = '';
+  game.trick.forEach(t => { const el = cardEl(t.c); el.classList.add('p' + t.p); tr.appendChild(el); });
+  document.getElementById('trickNo').textContent = `Stich ${game.tricksDone}/8`;
+}
+
+function play(p, c) {
+  if (game.busy) return;
+  game.hands[p] = game.hands[p].filter(x => x !== c);
+  game.trick.push({p, c});
+  if (isCalledAce(c) && !game.revealed) { game.revealed = true; say(`${NAMES[p]} hat die ${SUITNAME[c.suit]}-Sau – ${NAMES[p]} spielt mit dir!`); }
+  if (game.trick.length === 4) {
+    game.busy = true; render();
+    const w = trickWinner(game.trick);
+    const pts = game.trick.reduce((s,t) => s + POINTS[t.c.rank], 0);
+    setTimeout(() => {
+      say(`${NAMES[w]} ${w===0?'gewinnst':'gewinnt'} den Stich (${pts} Augen).`);
+      setTimeout(() => {
+        game.taken[w] += pts; game.trick = []; game.tricksDone++; game.leader = w; game.turn = w; game.busy = false;
+        render();
+        if (game.tricksDone === 8) return endGame();
+        nextTurn();
+      }, 1100);
+    }, 500);
+    return;
+  }
+  game.turn = (p + 1) % 4;
+  render();
+  nextTurn();
+}
+
+function nextTurn() {
+  if (game.busy) return;
+  if (game.turn === 0) { if (game.trick.length === 0) say('Du spielst aus.'); else if (!game.revealed || game.trick.length) say('Du bist dran.'); render(); return; }
+  setTimeout(() => play(game.turn, botChoose(game.turn)), 650);
+}
+
+// ---------- Computergegner ----------
+const team = p => (p === 0 || p === game.partner) ? 'A' : 'B';
+function botChoose(p) {
+  const legal = legalCards(p);
+  const byLow = [...legal].sort((a,b) => strength(a) - strength(b));
+  if (game.trick.length === 0) {
+    const aces = legal.filter(c => c.rank === 'A' && !isTrump(c));
+    if (aces.length) return aces[0];
+    const plain = byLow.filter(c => !isTrump(c));
+    if (team(p) === 'A' || !plain.length) return byLow[byLow.length - 1 - Math.floor(Math.random()*Math.min(2,byLow.length))] || byLow[0];
+    return plain[0];
+  }
+  const winner = trickWinner(game.trick);
+  const mateWins = team(winner) === team(p);
+  const last = game.trick.length === 3;
+  if (mateWins && (last || isTrump(game.trick.find(t=>t.p===winner).c) && trumpRank(game.trick.find(t=>t.p===winner).c) >= 80)) {
+    // schmieren: viele Augen, aber keine hohen Trümpfe
+    return [...legal].sort((a,b) => (POINTS[b.rank] - (isTrump(b)&&trumpRank(b)>=80?20:0)) - (POINTS[a.rank] - (isTrump(a)&&trumpRank(a)>=80?20:0)))[0];
+  }
+  const winners = byLow.filter(c => trickWinner([...game.trick, {p, c}]) === p);
+  if (winners.length && !mateWins) return winners[0];
+  if (mateWins) return byLow[0];
+  return [...legal].sort((a,b) => POINTS[a.rank] - POINTS[b.rank] || strength(a) - strength(b))[0];
+}
+
+function endGame() {
+  const a = game.taken[0] + game.taken[game.partner];
+  const b = 120 - a;
+  const win = a >= 61;
+  const ov = document.getElementById('overlay');
+  ov.innerHTML = `<div class="panel"><h2>${win ? 'Gewonnen!' : 'Verloren'}</h2>
+    <p>Du hast mit ${NAMES[game.partner]} gespielt.</p>
+    <div class="score">${a} : ${b}</div>
+    <p>${win ? (a >= 91 ? 'Sogar mit Schneider. Respekt!' : 'Mindestens 61 Augen, das reicht.') : (a < 31 ? 'Schneider verloren. Autsch.' : 'Knapp daneben ist auch vorbei.')}</p>
+    <button id="again">Nochmal</button></div>`;
+  ov.classList.remove('hidden');
+  document.getElementById('again').onclick = deal;
+}
+
+document.getElementById('newBtn').onclick = deal;
+deal();
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+@font-face {
+    font-family: 'Bricolage Grotesque';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('../fonts/bricolage-grotesque-latin.woff2') format('woff2');
+}
+
+/* Color values stay in oklch because the design source defines them that way. */
+:root {
+    color-scheme: light dark;
+
+    --font-family-base: 'Bricolage Grotesque', system-ui, sans-serif;
+    --font-weight-regular: 400;
+    --font-weight-medium: 600;
+    --font-weight-bold: 700;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5625rem;
+    --font-size-3xl: 3rem;
+    --leading-tight: 1;
+    --leading-snug: 1.15;
+    --leading-normal: 1.5;
+
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+
+    --color-surface-page: light-dark(oklch(0.955 0.008 85), oklch(0.2 0.015 60));
+    --color-surface-control: light-dark(oklch(0.25 0.02 60 / 0.07), oklch(0.97 0.01 85 / 0.1));
+    --color-surface-control-selected: light-dark(oklch(0.985 0.005 85), oklch(0.34 0.02 60));
+    --color-surface-dialog: oklch(0.985 0.005 85);
+    --color-surface-dialog-row: oklch(0.25 0.02 60 / 0.05);
+    --color-surface-card: oklch(0.975 0.008 85);
+    --color-surface-accent: oklch(0.82 0.15 85);
+    --color-surface-accent-subtle: oklch(0.82 0.15 85 / 0.24);
+    --color-text-primary: light-dark(oklch(0.24 0.02 60), oklch(0.95 0.01 85));
+    --color-text-dialog: oklch(0.24 0.02 60);
+    --color-text-on-accent: oklch(0.25 0.03 60);
+    --color-text-on-table: oklch(0.97 0.01 90);
+    --color-interactive-default: light-dark(oklch(0.47 0.13 145), oklch(0.62 0.13 145));
+    --color-interactive-hover: light-dark(oklch(0.35 0.1 145), oklch(0.7 0.12 145));
+    --color-text-on-interactive: light-dark(oklch(0.98 0.01 90), oklch(0.18 0.02 145));
+    --color-border-focus: oklch(0.82 0.15 85);
+    --color-status-success: oklch(0.47 0.13 145);
+    --color-status-error: oklch(0.52 0.19 25);
+
+    --color-table-felt-light: oklch(0.47 0.085 158);
+    --color-table-felt-dark: oklch(0.33 0.065 162);
+    --color-table-wood-base: oklch(0.3 0.045 50);
+    --color-table-wood-light: oklch(0.36 0.05 52);
+    --color-table-wood-dark: oklch(0.22 0.035 45);
+    --color-table-wood-grain-dark: oklch(0.1 0.02 50 / 0.12);
+    --color-table-wood-grain-light: oklch(0.97 0.01 85 / 0.03);
+    --color-table-rim: oklch(0.27 0.04 55);
+    --color-table-overlay-panel: oklch(0.1 0.02 60 / 0.26);
+    --color-table-overlay-badge: oklch(0.1 0.02 60 / 0.3);
+    --color-table-overlay-info: oklch(0.1 0.02 60 / 0.4);
+    --color-table-track: oklch(0.97 0.01 90 / 0.15);
+    --color-table-track-neutral: oklch(0.97 0.01 90 / 0.55);
+    --color-table-slot-border: oklch(0.97 0.01 90 / 0.4);
+
+    --color-card-back: oklch(0.29 0.05 262);
+    --color-card-back-pattern: oklch(0.97 0.01 90 / 0.06);
+    --color-card-back-frame: oklch(0.78 0.11 80 / 0.55);
+    --color-card-dim: oklch(0.2 0.03 160 / 0.32);
+    --color-figure-skin: oklch(0.86 0.05 60);
+    --color-figure-cheek: oklch(0.75 0.1 25);
+    --color-figure-line: oklch(0.25 0.02 60);
+    --color-figure-hat: oklch(0.3 0.03 60);
+    --color-figure-crown: oklch(0.78 0.14 80);
+    --color-figure-beard: oklch(0.93 0.01 85);
+    --color-figure-belt: oklch(0.1 0.02 60 / 0.22);
+
+    --color-suit-eichel-text: oklch(0.44 0.08 55);
+    --color-suit-eichel-main: oklch(0.5 0.085 55);
+    --color-suit-eichel-tint: oklch(0.5 0.085 55 / 0.12);
+    --color-suit-gras-text: oklch(0.47 0.13 145);
+    --color-suit-gras-main: oklch(0.55 0.13 145);
+    --color-suit-gras-tint: oklch(0.55 0.13 145 / 0.12);
+    --color-suit-herz-text: oklch(0.52 0.19 25);
+    --color-suit-herz-main: oklch(0.56 0.19 25);
+    --color-suit-herz-tint: oklch(0.56 0.19 25 / 0.1);
+    --color-suit-schellen-text: oklch(0.56 0.12 62);
+    --color-suit-schellen-main: oklch(0.72 0.14 74);
+    --color-suit-schellen-tint: oklch(0.72 0.14 74 / 0.16);
+
+    --shadow-card: 0 0.5cqw 0 oklch(0.1 0.02 60 / 0.06), 0 3cqw 7cqw oklch(0.1 0.02 60 / 0.22);
+    --shadow-raised: 0 1px 3px oklch(0.1 0.02 60 / 0.15);
+    --shadow-dialog: 0 1.5cqw 5cqw oklch(0.1 0.02 60 / 0.4);
+
+    --radius-pill: 999px;
+
+    --duration-fast: 160ms;
+    --duration-medium: 260ms;
+    --duration-collect: 300ms;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+    --winning-share: calc(61 / 120);
+}
