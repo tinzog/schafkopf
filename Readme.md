@@ -1,0 +1,1 @@
+Schafkopf App mit Claude erstellt
