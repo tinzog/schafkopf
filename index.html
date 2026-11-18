@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Schafkopf</title>
+  <style>
+    @layer settings, generic, elements, objects, components, utilities;
+
+    @layer settings {
+      :root {
+        color-scheme: light dark;
+
+        --color-ink-900: hsl(60 4% 11%);
+        --color-ink-500: hsl(72 4% 47%);
+        --color-paper-50: hsl(72 23% 96%);
+        --color-paper-0: hsl(60 20% 99%);
+        --color-paper-200: hsl(72 9% 81%);
+        --color-lime-400: hsl(79 68% 58%);
+        --color-green-felt-light: hsl(150 32% 30%);
+        --color-green-felt-mid: hsl(150 34% 22%);
+        --color-green-felt-dark: hsl(150 38% 13%);
+        --color-green-felt-deep: hsl(150 40% 8%);
+        --color-wood-600: hsl(25 38% 20%);
+        --color-wood-800: hsl(25 34% 13%);
+        --color-suit-eichel: var(--color-ink-900);
+        --color-suit-gras: hsl(78 72% 40%);
+        --color-suit-herz: hsl(5 70% 51%);
+        --color-suit-schellen: hsl(32 100% 50%);
+
+        --color-surface-table: light-dark(var(--color-green-felt-light), var(--color-green-felt-dark));
+        --color-surface-table-edge: light-dark(var(--color-green-felt-mid), var(--color-green-felt-deep));
+        --color-surface-frame: light-dark(var(--color-wood-600), var(--color-wood-800));
+        --color-surface-panel: light-dark(var(--color-paper-50), hsl(60 4% 15%));
+        --color-surface-card: var(--color-paper-0);
+        --color-text-primary: light-dark(var(--color-ink-900), var(--color-paper-50));
+        --color-text-secondary: light-dark(var(--color-ink-500), hsl(72 6% 68%));
+        --color-text-on-table: var(--color-paper-50);
+        --color-text-on-card: var(--color-ink-900);
+        --color-border-card: var(--color-paper-200);
+        --color-interactive-accent: var(--color-lime-400);
+        --color-interactive-on-accent: var(--color-ink-900);
+        --color-shadow: hsl(60 4% 11% / 0.35);
+        --color-backdrop: hsl(150 40% 6% / 0.55);
+
+        --font-family-base: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
+        --font-family-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+        --font-size-xs: 0.75rem;
+        --font-size-sm: 0.875rem;
+        --font-size-base: 1rem;
+        --font-size-lg: 1.25rem;
+        --font-size-xl: 1.563rem;
+        --leading-tight: 1.15;
+        --leading-normal: 1.5;
+
+        --space-1: 0.25rem;
+        --space-2: 0.5rem;
+        --space-3: 0.75rem;
+        --space-4: 1rem;
+        --space-6: 1.5rem;
+        --space-8: 2rem;
+
+        --radius-sm: 0.375rem;
+        --radius-md: 0.75rem;
+        --radius-pill: 999rem;
+
+        --duration-fast: 150ms;
+        --duration-normal: 220ms;
+        --ease-out: cubic-bezier(.165, .84, .44, 1);
+
+        --card-inline-size: clamp(3rem, min(11vw, 11dvh), 7.5rem);
+        --card-block-size: calc(var(--card-inline-size) * 1.5);
+        --fan-spread: 0.62;
+      }
+    }
+
+    @layer generic {
+      *, *::before, *::after { box-sizing: border-box; }
+      body, h1, h2, p, dl, dd { margin: 0; }
+      button { font: inherit; color: inherit; }
+    }
+
+    @layer elements {
+      body {
+        block-size: 100dvh;
+        overflow: hidden;
+        font-family: var(--font-family-base);
+        font-size: var(--font-size-base);
+        line-height: var(--leading-normal);
+        color: var(--color-text-on-table);
+        background:
+          repeating-linear-gradient(97deg, transparent 0 0.6rem, hsl(25 30% 8% / 0.25) 0.6rem 0.7rem),
+          var(--color-surface-frame);
+      }
+    }
+
+    @layer objects {
+      .l-table {
+        display: grid;
+        grid-template:
+          "hud top info" auto
+          "left center right" 1fr
+          "hand hand hand" auto
+          / minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        gap: var(--space-2);
+        block-size: calc(100dvh - 2 * var(--space-3));
+        margin: var(--space-3);
+        padding: var(--space-3);
+        border-radius: 1.5rem;
+        background:
+          radial-gradient(ellipse at 50% 45%, var(--color-surface-table) 0%, var(--color-surface-table-edge) 100%);
+        box-shadow: inset 0 0 0 2px hsl(79 68% 58% / 0.15), inset 0 0 3rem hsl(150 40% 4% / 0.6);
+        overflow: hidden;
+      }
+
+      @media (max-width: 40em) {
+        :root { --fan-spread: 0.42; }
+
+        .l-table {
+          grid-template:
+            "hud hud hud" auto
+            "top top top" auto
+            "left center right" 1fr
+            "hand hand hand" auto
+            / minmax(0, 1fr) minmax(0, 3fr) minmax(0, 1fr);
+          margin: var(--space-1);
+          padding: var(--space-2);
+          block-size: calc(100dvh - 2 * var(--space-1));
+        }
+      }
+    }
+
+    @layer components {
+      /* Card */
+      .c-card {
+        display: block;
+        inline-size: var(--card-inline-size);
+        aspect-ratio: 2 / 3;
+      }
+
+      .c-card__svg {
+        display: block;
+        inline-size: 100%;
+        block-size: 100%;
+        overflow: visible;
+        filter: drop-shadow(0 1px 1.5px var(--color-shadow));
+      }
+
+      .c-card--eichel { color: var(--color-suit-eichel); }
+      .c-card--gras { color: var(--color-suit-gras); }
+      .c-card--herz { color: var(--color-suit-herz); }
+      .c-card--schellen { color: var(--color-suit-schellen); }
+
+      .c-card__face { fill: var(--color-surface-card); stroke: var(--color-border-card); }
+      .c-card__rank {
+        font-family: var(--font-family-base);
+        font-weight: 800;
+        letter-spacing: -0.6px;
+        fill: var(--color-text-on-card);
+      }
+      .c-card__label { font-family: var(--font-family-mono); letter-spacing: 2.4px; fill: var(--color-ink-500); }
+
+      /* HUD */
+      .c-hud {
+        grid-area: hud;
+        align-self: start;
+        justify-self: start;
+        display: grid;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-4);
+        border-radius: var(--radius-md);
+        background: var(--color-surface-panel);
+        color: var(--color-text-primary);
+        box-shadow: 0 0.5rem 1.5rem var(--color-shadow);
+        font-size: var(--font-size-sm);
+        line-height: var(--leading-tight);
+      }
+
+      .c-hud__list { display: grid; gap: var(--space-1); }
+      .c-hud__item { display: flex; gap: var(--space-2); align-items: center; }
+      .c-hud__term {
+        min-inline-size: 5.5rem;
+        font-family: var(--font-family-mono);
+        font-size: var(--font-size-xs);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--color-text-secondary);
+      }
+      .c-hud__value { display: inline-flex; gap: var(--space-1); align-items: center; font-weight: 700; }
+      .c-hud__icon { inline-size: 1.1rem; block-size: 1.1rem; }
+
+      .c-score {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-2);
+        padding-block-start: var(--space-2);
+        border-block-start: 1px solid var(--color-border-card);
+      }
+      .c-score__team { display: grid; }
+      .c-score__label { font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+      .c-score__value { font-size: var(--font-size-xl); font-weight: 800; font-variant-numeric: tabular-nums; }
+      .c-score__team--player .c-score__value { color: light-dark(hsl(78 72% 32%), var(--color-lime-400)); }
+
+      @media (max-width: 40em) {
+        .c-hud {
+          justify-self: stretch;
+          grid-template-columns: 1fr auto;
+          align-items: center;
+          padding: var(--space-2) var(--space-3);
+        }
+        .c-hud__term { min-inline-size: 4rem; }
+        .c-score { padding-block-start: 0; border-block-start: 0; }
+        .c-score__value { font-size: var(--font-size-lg); }
+      }
+
+      /* Seats */
+      .c-seat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        --back-inline-size: calc(var(--card-inline-size) * 0.55);
+      }
+      .c-seat--top { grid-area: top; }
+      .c-seat--left { grid-area: left; }
+      .c-seat--right { grid-area: right; }
+
+      .c-seat__plate {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-1) var(--space-2);
+        align-items: baseline;
+        justify-content: center;
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-pill);
+        background: hsl(150 40% 4% / 0.45);
+        box-shadow: 0 0 0 2px transparent;
+        transition: box-shadow var(--duration-normal) ease, background-color var(--duration-normal) ease;
+      }
+      .c-seat.is-active .c-seat__plate {
+        background: hsl(150 40% 4% / 0.7);
+        box-shadow: 0 0 0 2px var(--color-interactive-accent);
+      }
+      .c-seat__name { font-weight: 800; }
+      .c-seat__tricks { font-family: var(--font-family-mono); font-size: var(--font-size-xs); opacity: 0.75; }
+      .c-seat__badge {
+        padding-inline: var(--space-2);
+        border-radius: var(--radius-pill);
+        font-size: var(--font-size-xs);
+        font-weight: 700;
+        background: hsl(0 0% 100% / 0.15);
+      }
+      .c-seat__badge:empty { display: none; }
+      .c-seat__badge.is-partner { background: var(--color-interactive-accent); color: var(--color-interactive-on-accent); }
+
+      .c-seat__cards { display: flex; min-block-size: calc(var(--back-inline-size) * 1.5); }
+      .c-seat__cards .c-card { inline-size: var(--back-inline-size); }
+      .c-seat__cards .c-card + .c-card { margin-inline-start: calc(var(--back-inline-size) * -0.72); }
+
+      .c-seat--left .c-seat__cards,
+      .c-seat--right .c-seat__cards { flex-direction: column; }
+      .c-seat--left .c-seat__cards .c-card + .c-card,
+      .c-seat--right .c-seat__cards .c-card + .c-card {
+        margin-inline-start: 0;
+        margin-block-start: calc(var(--back-inline-size) * -1.32);
+      }
+
+      @media (max-width: 40em) {
+        .c-seat { --back-inline-size: calc(var(--card-inline-size) * 0.4); }
+      }
+
+      /* Trick */
+      .c-center {
+        grid-area: center;
+        display: grid;
+        place-items: center;
+        align-content: center;
+        gap: var(--space-3);
+      }
+
+      .c-trick {
+        position: relative;
+        inline-size: calc(var(--card-inline-size) * 2.7);
+        block-size: calc(var(--card-block-size) * 1.6);
+      }
+
+      .c-trick__card {
+        --dx: 0px;
+        --dy: 0px;
+        --enter-dx: 0px;
+        --enter-dy: 0px;
+        position: absolute;
+        inset-inline-start: 50%;
+        inset-block-start: 50%;
+        translate: calc(-50% + var(--dx)) calc(-50% + var(--dy));
+        animation: c-trick-in var(--duration-normal) var(--ease-out);
+        transition: filter var(--duration-normal) ease;
+      }
+      .c-trick__card--bottom { --dy: calc(var(--card-block-size) * 0.45); --enter-dy: 3rem; rotate: 2deg; }
+      .c-trick__card--top { --dy: calc(var(--card-block-size) * -0.45); --enter-dy: -3rem; rotate: -3deg; }
+      .c-trick__card--left { --dx: calc(var(--card-inline-size) * -0.68); --enter-dx: -3rem; rotate: -8deg; }
+      .c-trick__card--right { --dx: calc(var(--card-inline-size) * 0.68); --enter-dx: 3rem; rotate: 7deg; }
+      .c-trick__card.is-winning { z-index: 1; }
+      .c-trick__card.is-winning .c-card__svg {
+        filter: drop-shadow(0 0 0.6rem var(--color-interactive-accent)) drop-shadow(0 1px 1.5px var(--color-shadow));
+      }
+
+      @keyframes c-trick-in {
+        from {
+          opacity: 0;
+          scale: 0.95;
+          translate: calc(-50% + var(--dx) + var(--enter-dx)) calc(-50% + var(--dy) + var(--enter-dy));
+        }
+      }
+
+      @keyframes c-fade-in { from { opacity: 0; } }
+
+      .c-message {
+        min-block-size: calc(var(--leading-normal) * 2em);
+        max-inline-size: 32ch;
+        text-align: center;
+        font-weight: 600;
+        text-wrap: balance;
+      }
+
+      /* Own hand */
+      .c-hand {
+        grid-area: hand;
+        position: relative;
+        block-size: calc(var(--card-block-size) + var(--space-8) + var(--space-4));
+      }
+
+      .c-hand__plate {
+        position: absolute;
+        inset-inline-start: 0;
+        inset-block-end: 0;
+        z-index: 2;
+      }
+
+      .c-hand__card {
+        --offset: calc(var(--i) - (var(--n) - 1) / 2);
+        --lift: 0rem;
+        position: absolute;
+        inset-inline-start: 50%;
+        inset-block-end: var(--space-6);
+        margin-inline-start: calc(var(--card-inline-size) / -2);
+        padding: 0;
+        border: 0;
+        border-radius: var(--radius-sm);
+        background: none;
+        cursor: pointer;
+        transform-origin: 50% 130%;
+        translate:
+          calc(var(--offset) * var(--card-inline-size) * var(--fan-spread))
+          calc(var(--offset) * var(--offset) * 0.2rem - var(--lift));
+        rotate: calc(var(--offset) * 3.5deg);
+        transition: var(--duration-normal) var(--ease-out);
+        transition-property: translate, rotate, filter, opacity;
+      }
+      .c-hand__card:disabled { cursor: default; }
+      .c-hand__card.is-blocked { filter: saturate(0.35) brightness(0.72); }
+      .c-hand__card.is-playable .c-card__svg {
+        filter: drop-shadow(0 0 0.35rem hsl(79 68% 58% / 0.55)) drop-shadow(0 1px 1.5px var(--color-shadow));
+      }
+      .c-hand__card:focus-visible {
+        --lift: var(--space-4);
+        outline: 3px solid var(--color-interactive-accent);
+        outline-offset: 2px;
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        .c-hand__card.is-playable:hover { --lift: var(--space-4); }
+      }
+
+      /* Dialogs */
+      .c-dialog {
+        max-inline-size: min(26rem, calc(100vw - 2 * var(--space-4)));
+        padding: var(--space-6);
+        border: 0;
+        border-radius: var(--radius-md);
+        background: var(--color-surface-panel);
+        color: var(--color-text-primary);
+        box-shadow: 0 1rem 3rem var(--color-shadow);
+      }
+      .c-dialog[open] { animation: c-dialog-in var(--duration-normal) var(--ease-out); }
+      .c-dialog::backdrop { background: var(--color-backdrop); }
+      .c-dialog__title { font-size: var(--font-size-xl); line-height: var(--leading-tight); }
+      .c-dialog__text { margin-block-start: var(--space-2); color: var(--color-text-secondary); }
+      .c-dialog__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-block-start: var(--space-4); }
+
+      @keyframes c-dialog-in { from { opacity: 0; scale: 0.96; } }
+
+      .c-button {
+        display: inline-flex;
+        gap: var(--space-2);
+        align-items: center;
+        padding: var(--space-2) var(--space-4);
+        border: 2px solid var(--color-text-primary);
+        border-radius: var(--radius-pill);
+        background: transparent;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
+      }
+      .c-button--primary {
+        border-color: var(--color-interactive-accent);
+        background: var(--color-interactive-accent);
+        color: var(--color-interactive-on-accent);
+      }
+      .c-button:focus-visible { outline: 3px solid var(--color-interactive-accent); outline-offset: 2px; }
+      .c-button__icon {
+        inline-size: 1.5rem;
+        block-size: 1.5rem;
+        padding: 0.15rem;
+        border-radius: var(--radius-sm);
+        background: var(--color-paper-0);
+      }
+      .c-button__icon--eichel { color: var(--color-suit-eichel); }
+      .c-button__icon--gras { color: var(--color-suit-gras); }
+      .c-button__icon--schellen { color: var(--color-suit-schellen); }
+      .c-hud__icon--eichel { color: var(--color-suit-eichel); }
+      .c-hud__icon--gras { color: var(--color-suit-gras); }
+      .c-hud__icon--schellen { color: var(--color-suit-schellen); }
+
+      @media (hover: hover) and (pointer: fine) {
+        .c-button:hover { background: var(--color-text-primary); color: var(--color-surface-panel); }
+        .c-button--primary:hover { background: var(--color-paper-0); color: var(--color-interactive-on-accent); }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .c-trick__card { animation: c-fade-in var(--duration-fast) linear; }
+        .c-dialog[open] { animation: c-fade-in var(--duration-fast) linear; }
+        .c-hand__card { transition-property: filter, opacity; }
+      }
+    }
+
+    @layer utilities {
+      .u-svg-defs {
+        position: absolute;
+        inline-size: 0;
+        block-size: 0;
+        overflow: hidden;
+      }
+      .u-sr-only {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <svg class="u-svg-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="sk-herz" viewBox="0 0 24 24"><path d="M12 21.2C12 21.2 2.6 15.4 2.6 9.1C2.6 6.1 4.9 3.7 7.8 3.7C9.7 3.7 11.2 4.8 12 6.3C12.8 4.8 14.3 3.7 16.2 3.7C19.1 3.7 21.4 6.1 21.4 9.1C21.4 15.4 12 21.2 12 21.2Z" fill="currentColor"/></symbol>
+      <symbol id="sk-schellen" viewBox="0 0 24 24"><circle cx="12" cy="4.2" r="1.9" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="13.6" r="8.6" fill="currentColor"/><rect x="3.4" y="10.6" width="17.2" height="2.4" fill="#ffffff" opacity=".55"/><path d="M8.2 17.6H15.8" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="sk-gras" viewBox="0 0 24 24"><path d="M12 1.6C17.8 5.6 20 11 17.8 15.6C16.3 18.9 14 20.2 12 20.8C10 20.2 7.7 18.9 6.2 15.6C4 11 6.2 5.6 12 1.6Z" fill="currentColor"/><path d="M12 20.6V23.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 6V18.6M12 10.8L15 8.4M12 14.4L15.6 11.8M12 10.8L9 8.4M12 14.4L8.4 11.8" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" opacity=".7" fill="none"/></symbol>
+      <symbol id="sk-eichel" viewBox="0 0 24 24"><path d="M12 3.6V1.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.6 10.6H17.4C17.4 16.4 15 21 12 22.8C9 21 6.6 16.4 6.6 10.6Z" fill="currentColor" opacity=".72"/><path d="M4.6 10.4C4.6 5.8 7.9 3.4 12 3.4C16.1 3.4 19.4 5.8 19.4 10.4Z" fill="currentColor"/><path d="M8 7.4H16M7 9H17" stroke="#ffffff" stroke-width=".9" opacity=".4"/></symbol>
+
+      <radialGradient id="sk-glow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#afdc4b" stop-opacity=".55"/><stop offset="100%" stop-color="#afdc4b" stop-opacity="0"/></radialGradient>
+      <pattern id="sk-lat" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M0 6L6 0L12 6L6 12Z" fill="none" stroke="#afdc4b" stroke-width=".8" opacity=".38"/></pattern>
+
+      <symbol id="sk-figure" viewBox="0 0 120 180">
+        <rect x="24" y="26" width="72" height="128" rx="8" fill="#f0f2ea"/>
+        <path d="M38 154L41 113Q60 99 79 113L82 154Z" fill="currentColor"/>
+        <rect x="55" y="94" width="10" height="11" fill="#efc9a6"/>
+        <path d="M46.5 107Q60 99.5 73.5 107L71.5 111.5Q60 105.5 48.5 111.5Z" fill="#ffffff" stroke="#1d1d1b" stroke-width=".8" stroke-linejoin="round"/>
+        <circle cx="60" cy="118" r="1.3" fill="#ffffff"/>
+        <circle cx="60" cy="125" r="1.3" fill="#ffffff"/>
+        <ellipse cx="47.6" cy="85" rx="2.6" ry="3.6" fill="#efc9a6" stroke="#c9946f" stroke-width=".8"/>
+        <ellipse cx="72.4" cy="85" rx="2.6" ry="3.6" fill="#efc9a6" stroke="#c9946f" stroke-width=".8"/>
+        <ellipse cx="60" cy="84" rx="12.5" ry="14.5" fill="#efc9a6" stroke="#c9946f" stroke-width=".9"/>
+        <path d="M47.6 83C47 74 52 69.5 60 69.5C68 69.5 73 74 72.4 83C70.5 77.5 67 75.8 60 75.8C53 75.8 49.5 77.5 47.6 83Z" fill="#5a4632"/>
+        <path d="M52 79.6Q55 78 58 79.4M62 79.4Q65 78 68 79.6" fill="none" stroke="#5a4632" stroke-width="1.3" stroke-linecap="round"/>
+        <ellipse cx="55" cy="83.2" rx="1.4" ry="1.7" fill="#1d1d1b"/>
+        <ellipse cx="65" cy="83.2" rx="1.4" ry="1.7" fill="#1d1d1b"/>
+        <path d="M60 84Q61.8 88.4 59.4 89.4" fill="none" stroke="#c9946f" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="52.4" cy="89.2" r="2.3" fill="#e9967a" opacity=".35"/>
+        <circle cx="67.6" cy="89.2" r="2.3" fill="#e9967a" opacity=".35"/>
+        <path d="M57.4 94.2Q60 95.8 62.6 94.2" fill="none" stroke="#a8604a" stroke-width="1.2" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="sk-figure-K" viewBox="0 0 120 180">
+        <path d="M46 70L46 56L52.5 62L60 51L67.5 62L74 56L74 70Z" fill="#afdc4b" stroke="#1d1d1b" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="M48 88Q49 102 60 103.5Q71 102 72 88Q70 96 65 96.5Q62.5 93.5 60 94Q57.5 93.5 55 96.5Q50 96 48 88Z" fill="#5a4632"/>
+        <path d="M54.5 92.4Q57 89.8 60 91.2Q63 89.8 65.5 92.4Q63 93 60 92.2Q57 93 54.5 92.4Z" fill="#5a4632"/>
+        <circle cx="60" cy="128" r="11" fill="#ffffff"/>
+      </symbol>
+      <symbol id="sk-figure-O" viewBox="0 0 120 180">
+        <path d="M43 73C45 60 75 60 77 73Z" fill="#1d1d1b"/>
+        <path d="M54.5 92.4Q57 89.8 60 91.2Q63 89.8 65.5 92.4Q63 93 60 92.2Q57 93 54.5 92.4Z" fill="#5a4632"/>
+        <path d="M70 64C74 57 74 52 70 47" fill="none" stroke="#afdc4b" stroke-width="3" stroke-linecap="round"/>
+        <path d="M77 112L88 64" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="88.5" cy="61" r="4" fill="#efc9a6" stroke="#c9946f" stroke-width="1"/>
+      </symbol>
+      <symbol id="sk-figure-U" viewBox="0 0 120 180">
+        <path d="M46 73C46 62 74 62 74 73L81 74.5L46 74.5Z" fill="#1d1d1b"/>
+        <path d="M43 113L34 128" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="33" cy="131" r="4" fill="#efc9a6" stroke="#c9946f" stroke-width="1"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <main
+    class="c-game l-table"
+    data-texts='{
+      "suits": {"eichel": "Eichel", "gras": "Gras", "herz": "Herz", "schellen": "Schellen"},
+      "ranks": {"A": "Sau", "10": "Zehn", "K": "König", "O": "Ober", "U": "Unter", "9": "Neun", "8": "Acht", "7": "Sieben"},
+      "sauLabel": "SAU",
+      "players": ["Du", "Sepp", "Resi", "Hias"],
+      "yourTurn": "Du bist dran – spiel eine Karte.",
+      "yourLead": "Du spielst aus.",
+      "thinking": "{name} ist dran …",
+      "trickWonYou": "Du machst den Stich ({points} Augen).",
+      "trickWon": "{name} macht den Stich ({points} Augen).",
+      "redeal": "Du kannst keine Sau rufen – es wird neu gegeben.",
+      "callPrompt": "Schau dir dein Blatt an und ruf eine Sau.",
+      "calledSau": "{suit}-Sau",
+      "partnerHidden": "noch verdeckt",
+      "scoreOwn": "Deine Augen",
+      "scoreRest": "Andere",
+      "scoreTeam": "Spieler-Team",
+      "scoreOpponents": "Gegner",
+      "tricks": "Stiche: {count}",
+      "partner": "Partner",
+      "opponent": "Gegner",
+      "won": "Gewonnen!",
+      "lost": "Verloren.",
+      "resultText": "Spieler-Team {team} : {opponents} Gegner. Dein Partner war {name}.",
+      "cardLabel": "{suit} {rank}"
+    }'
+  >
+    <h1 class="u-sr-only">Schafkopf – Sauspiel gegen drei Computergegner</h1>
+
+    <header class="c-hud" aria-label="Spielstand">
+      <dl class="c-hud__list">
+        <div class="c-hud__item">
+          <dt class="c-hud__term">Spielart</dt>
+          <dd class="c-hud__value">Sauspiel</dd>
+        </div>
+        <div class="c-hud__item">
+          <dt class="c-hud__term">Gerufen</dt>
+          <dd class="c-hud__value js-called">–</dd>
+        </div>
+        <div class="c-hud__item">
+          <dt class="c-hud__term">Partner</dt>
+          <dd class="c-hud__value js-partner">–</dd>
+        </div>
+      </dl>
+      <div class="c-score" aria-live="polite">
+        <div class="c-score__team c-score__team--player">
+          <span class="c-score__label js-score-player-label"></span>
+          <span class="c-score__value js-score-player">0</span>
+        </div>
+        <div class="c-score__team">
+          <span class="c-score__label js-score-other-label"></span>
+          <span class="c-score__value js-score-other">0</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="c-seat c-seat--left js-seat" data-seat="1">
+      <div class="c-seat__plate">
+        <span class="c-seat__name js-seat-name"></span>
+        <span class="c-seat__badge js-seat-badge"></span>
+        <span class="c-seat__tricks js-seat-tricks"></span>
+      </div>
+      <div class="c-seat__cards js-seat-cards"></div>
+    </div>
+
+    <div class="c-seat c-seat--top js-seat" data-seat="2">
+      <div class="c-seat__cards js-seat-cards"></div>
+      <div class="c-seat__plate">
+        <span class="c-seat__name js-seat-name"></span>
+        <span class="c-seat__badge js-seat-badge"></span>
+        <span class="c-seat__tricks js-seat-tricks"></span>
+      </div>
+    </div>
+
+    <div class="c-seat c-seat--right js-seat" data-seat="3">
+      <div class="c-seat__plate">
+        <span class="c-seat__name js-seat-name"></span>
+        <span class="c-seat__badge js-seat-badge"></span>
+        <span class="c-seat__tricks js-seat-tricks"></span>
+      </div>
+      <div class="c-seat__cards js-seat-cards"></div>
+    </div>
+
+    <div class="c-center">
+      <div class="c-trick js-trick" aria-label="Aktueller Stich" role="group"></div>
+      <p class="c-message js-message" aria-live="polite"></p>
+    </div>
+
+    <div class="c-hand js-hand" role="group" aria-label="Deine Karten">
+      <div class="c-seat c-hand__plate js-seat" data-seat="0">
+        <div class="c-seat__plate">
+          <span class="c-seat__name js-seat-name"></span>
+          <span class="c-seat__tricks js-seat-tricks"></span>
+        </div>
+      </div>
+    </div>
+
+    <dialog class="c-dialog js-call-dialog" aria-labelledby="call-title">
+      <h2 class="c-dialog__title" id="call-title">Welche Sau rufst du?</h2>
+      <p class="c-dialog__text">Rufen kannst du eine Farbe, von der du eine Karte hast, aber nicht die Sau selbst.
+        Wer die Sau hat, spielt heimlich mit dir.</p>
+      <div class="c-dialog__actions js-call-options"></div>
+    </dialog>
+
+    <dialog class="c-dialog js-result-dialog" aria-labelledby="result-title">
+      <h2 class="c-dialog__title js-result-title" id="result-title"></h2>
+      <p class="c-dialog__text js-result-text"></p>
+      <div class="c-dialog__actions">
+        <button class="c-button c-button--primary js-next-game" type="button">Nächstes Spiel</button>
+      </div>
+    </dialog>
+  </main>
+
+  <template id="tpl-card-front">
+    <span class="c-card">
+      <svg class="c-card__svg" viewBox="0 0 120 180" aria-hidden="true" focusable="false">
+        <rect class="c-card__face" x=".5" y=".5" width="119" height="179" rx="9"/>
+        <g class="js-card-corner">
+          <text class="c-card__rank js-card-rank" x="13" y="22" text-anchor="middle" font-size="16"></text>
+          <use class="js-card-corner-suit" x="6" y="27" width="14" height="14"/>
+        </g>
+        <g class="js-card-corner" transform="rotate(180 60 90)">
+          <text class="c-card__rank js-card-rank" x="13" y="22" text-anchor="middle" font-size="16"></text>
+          <use class="js-card-corner-suit" x="6" y="27" width="14" height="14"/>
+        </g>
+        <g class="js-card-body"></g>
+      </svg>
+    </span>
+  </template>
+
+  <template id="tpl-card-back">
+    <span class="c-card">
+      <svg class="c-card__svg" viewBox="0 0 120 180" aria-hidden="true" focusable="false">
+        <rect x=".5" y=".5" width="119" height="179" rx="9" fill="#1d1d1b"/>
+        <rect x="8" y="8" width="104" height="164" rx="5" fill="url(#sk-lat)" stroke="#afdc4b" stroke-opacity=".5"/>
+        <circle cx="60" cy="90" r="22" fill="#1d1d1b" stroke="#afdc4b" stroke-width="1.4"/>
+        <g color="#afdc4b">
+          <use href="#sk-eichel" x="47" y="77" width="12" height="12"/>
+          <use href="#sk-gras" x="61" y="77" width="12" height="12"/>
+          <use href="#sk-herz" x="47" y="91" width="12" height="12"/>
+          <use href="#sk-schellen" x="61" y="91" width="12" height="12"/>
+        </g>
+      </svg>
+    </span>
+  </template>
+
+  <template id="tpl-suit-icon">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use/></svg>
+  </template>
+
+  <template id="tpl-call-option">
+    <button class="c-button" type="button"><span class="js-call-icon"></span><span class="js-call-label"></span></button>
+  </template>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const SVG_NS = 'http://www.w3.org/2000/svg';
+      const SUITS = ['eichel', 'gras', 'herz', 'schellen'];
+      const RANKS = ['A', '10', 'K', 'O', 'U', '9', '8', '7'];
+      const CALLABLE_SUITS = ['eichel', 'gras', 'schellen'];
+      const TRUMP_SUIT = 'herz';
+      const TRUMP = 'trumpf';
+      const PLAIN_ORDER = ['7', '8', '9', 'K', '10', 'A'];
+      const POINTS = { A: 11, 10: 10, K: 4, O: 3, U: 2, 9: 0, 8: 0, 7: 0 };
+      const HUMAN = 0;
+      const PLAYER_COUNT = 4;
+      const HAND_SIZE = 8;
+      const WIN_THRESHOLD = 61;
+      const TOTAL_POINTS = 120;
+      const COMPUTER_DELAY_MS = 700;
+      const TRICK_PAUSE_MS = 1200;
+      const REDEAL_PAUSE_MS = 1600;
+      const SEAT_POSITIONS = ['bottom', 'left', 'top', 'right'];
+      const PIP_GRID = [[36, 40], [84, 40], [36, 72], [84, 72], [36, 108], [84, 108], [36, 140], [84, 140]];
+      const PIP_LAYOUTS = {
+        10: [...PIP_GRID, [60, 56], [60, 124]],
+        9: [...PIP_GRID, [60, 90]],
+        8: PIP_GRID,
+        7: [[36, 44], [84, 44], [36, 90], [84, 90], [36, 136], [84, 136], [60, 67]],
+      };
+      const PIP_SIZE = 18;
+      const FIGURE_SUIT_ICONS = {
+        K: { x: 51, y: 119, size: 18 },
+        O: { x: 78, y: 33, size: 22 },
+        U: { x: 22, y: 134, size: 21 },
+      };
+
+      const querySelectorRequired = (selector, root = document) => {
+        const element = root.querySelector(selector);
+        if (element === null) {
+          throw new Error(`Missing element: ${selector}`);
+        }
+        return element;
+      };
+
+      const signal = (initialValue) => {
+        let value = initialValue;
+        const subscribers = new Set();
+        return {
+          get value() { return value; },
+          set value(nextValue) {
+            value = nextValue;
+            subscribers.forEach((notify) => notify());
+          },
+          subscribe(notify) { subscribers.add(notify); },
+        };
+      };
+
+      const effect = (dependencies, callback) => {
+        const run = () => callback(...dependencies.map((dependency) => dependency.value));
+        dependencies.forEach((dependency) => dependency.subscribe(run));
+        run();
+      };
+
+      const sleep = (milliseconds) => new Promise((resolve) => { setTimeout(resolve, milliseconds); });
+      const format = (text, values) => text.replace(/\{(\w+)\}/g, (match, key) => String(values[key] ?? match));
+      const sumBy = (items, getValue) => items.reduce((total, item) => total + getValue(item), 0);
+      const minBy = (items, getValue) => items.reduce((best, item) => (getValue(item) < getValue(best) ? item : best));
+      const maxBy = (items, getValue) => items.reduce((best, item) => (getValue(item) > getValue(best) ? item : best));
+
+      /* Rules */
+
+      const isOberOrUnter = (card) => card.rank === 'O' || card.rank === 'U';
+      const isTrump = (card) => isOberOrUnter(card) || card.suit === TRUMP_SUIT;
+      const effectiveSuit = (card) => (isTrump(card) ? TRUMP : card.suit);
+      const plainStrength = (card) => PLAIN_ORDER.indexOf(card.rank);
+      const isCalledAce = (card, calledSuit) => card.rank === 'A' && card.suit === calledSuit;
+
+      const trumpStrength = (card) => {
+        const suitBonus = SUITS.length - 1 - SUITS.indexOf(card.suit);
+        switch (card.rank) {
+          case 'O': return 20 + suitBonus;
+          case 'U': return 10 + suitBonus;
+          default: return plainStrength(card);
+        }
+      };
+
+      const trickPower = (card, leadSuit) => {
+        if (isTrump(card)) {
+          return 100 + trumpStrength(card);
+        }
+        return card.suit === leadSuit ? plainStrength(card) + 1 : 0;
+      };
+
+      const trickWinnerEntry = (trick) => {
+        const leadSuit = effectiveSuit(trick[0].card);
+        return maxBy(trick, (entry) => trickPower(entry.card, leadSuit));
+      };
+
+      const legalCards = (hand, trick, calledSuit) => {
+        if (trick.length === 0) {
+          return hand;
+        }
+        const leadSuit = effectiveSuit(trick[0].card);
+        const following = hand.filter((card) => effectiveSuit(card) === leadSuit);
+        if (following.length === 0) {
+          return hand;
+        }
+        const calledAce = following.find((card) => isCalledAce(card, calledSuit));
+        return leadSuit === calledSuit && calledAce !== undefined ? [calledAce] : following;
+      };
+
+      const callableSuits = (hand) => CALLABLE_SUITS.filter((suit) => {
+        const hasSuitCard = hand.some((card) => effectiveSuit(card) === suit);
+        const hasAce = hand.some((card) => isCalledAce(card, suit));
+        return hasSuitCard && hasAce === false;
+      });
+
+      const createDeck = () => SUITS.flatMap((suit) => RANKS.map((rank) => ({ id: `${suit}-${rank}`, suit, rank })));
+
+      const shuffle = (cards) => {
+        const shuffled = [...cards];
+        for (let index = shuffled.length - 1; index > 0; index -= 1) {
+          const swapIndex = Math.floor(Math.random() * (index + 1));
+          [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+        }
+        return shuffled;
+      };
+
+      const displayOrder = (card) => {
+        if (isTrump(card)) {
+          return 1000 + trumpStrength(card);
+        }
+        return (CALLABLE_SUITS.length - CALLABLE_SUITS.indexOf(card.suit)) * 10 + plainStrength(card);
+      };
+
+      const sortHand = (hand) => [...hand].sort((first, second) => displayOrder(second) - displayOrder(first));
+
+      const dealHands = () => {
+        const deck = shuffle(createDeck());
+        return Array.from({ length: PLAYER_COUNT }, (unused, seat) => (
+          sortHand(deck.slice(seat * HAND_SIZE, (seat + 1) * HAND_SIZE))
+        ));
+      };
+
+      /* Rendering helpers */
+
+      const root = querySelectorRequired('.c-game');
+      const texts = JSON.parse(root.dataset.texts ?? '{}');
+      const cardFrontTemplate = querySelectorRequired('#tpl-card-front');
+      const cardBackTemplate = querySelectorRequired('#tpl-card-back');
+      const suitIconTemplate = querySelectorRequired('#tpl-suit-icon');
+      const callOptionTemplate = querySelectorRequired('#tpl-call-option');
+      const handElement = querySelectorRequired('.js-hand');
+      const trickElement = querySelectorRequired('.js-trick');
+      const messageElement = querySelectorRequired('.js-message');
+      const calledElement = querySelectorRequired('.js-called');
+      const partnerElement = querySelectorRequired('.js-partner');
+      const scorePlayerLabel = querySelectorRequired('.js-score-player-label');
+      const scorePlayerValue = querySelectorRequired('.js-score-player');
+      const scoreOtherLabel = querySelectorRequired('.js-score-other-label');
+      const scoreOtherValue = querySelectorRequired('.js-score-other');
+      const callDialog = querySelectorRequired('.js-call-dialog');
+      const callOptions = querySelectorRequired('.js-call-options');
+      const resultDialog = querySelectorRequired('.js-result-dialog');
+      const resultTitle = querySelectorRequired('.js-result-title');
+      const resultText = querySelectorRequired('.js-result-text');
+      const nextGameButton = querySelectorRequired('.js-next-game');
+      const seats = [...root.querySelectorAll('.js-seat')]
+        .map((element) => ({
+          seat: Number(element.dataset.seat),
+          element,
+          name: querySelectorRequired('.js-seat-name', element),
+          tricks: querySelectorRequired('.js-seat-tricks', element),
+          badge: element.querySelector('.js-seat-badge'),
+          cards: element.querySelector('.js-seat-cards'),
+        }))
+        .sort((first, second) => first.seat - second.seat);
+
+      if (seats.length !== PLAYER_COUNT) {
+        throw new Error('Expected four seats');
+      }
+
+      const { signal: abortSignal } = new AbortController();
+      const playerName = (seat) => texts.players[seat];
+      const cardLabel = (card) => format(texts.cardLabel, { suit: texts.suits[card.suit], rank: texts.ranks[card.rank] });
+
+      const createSvgElement = (tagName, attributes) => {
+        const element = document.createElementNS(SVG_NS, tagName);
+        Object.entries(attributes).forEach(([name, value]) => element.setAttribute(name, String(value)));
+        return element;
+      };
+
+      const createSuitUse = (suit, x, y, size) => createSvgElement('use', {
+        href: `#sk-${suit}`, x, y, width: size, height: size,
+      });
+
+      const appendCardBody = (body, card) => {
+        switch (card.rank) {
+          case 'A': {
+            body.append(
+              createSvgElement('circle', { cx: 60, cy: 86, r: 40, fill: 'url(#sk-glow)' }),
+              createSuitUse(card.suit, 32, 56, 56),
+            );
+            const label = createSvgElement('text', {
+              class: 'c-card__label', x: 60, y: 140, 'text-anchor': 'middle', 'font-size': 8.5,
+            });
+            label.textContent = texts.sauLabel;
+            body.append(label);
+            break;
+          }
+          case 'K':
+          case 'O':
+          case 'U': {
+            const icon = FIGURE_SUIT_ICONS[card.rank];
+            body.append(
+              createSvgElement('use', { href: '#sk-figure', x: 0, y: 0, width: 120, height: 180 }),
+              createSvgElement('use', { href: `#sk-figure-${card.rank}`, x: 0, y: 0, width: 120, height: 180 }),
+              createSuitUse(card.suit, icon.x, icon.y, icon.size),
+            );
+            break;
+          }
+          default:
+            PIP_LAYOUTS[card.rank].forEach(([x, y]) => {
+              const pip = createSuitUse(card.suit, x - PIP_SIZE / 2, y - PIP_SIZE / 2, PIP_SIZE);
+              if (y > 90) {
+                pip.setAttribute('transform', `rotate(180 ${x} ${y})`);
+              }
+              body.append(pip);
+            });
+        }
+      };
+
+      const createCardFront = (card) => {
+        const cardElement = cardFrontTemplate.content.firstElementChild.cloneNode(true);
+        const body = querySelectorRequired('.js-card-body', cardElement);
+        cardElement.classList.add(`c-card--${card.suit}`);
+        cardElement.querySelectorAll('.js-card-rank').forEach((rankText) => {
+          rankText.textContent = card.rank;
+          rankText.setAttribute('font-size', card.rank === '10' ? '14' : '16');
+        });
+        cardElement.querySelectorAll('.js-card-corner-suit').forEach((use) => {
+          use.setAttribute('href', `#sk-${card.suit}`);
+        });
+        appendCardBody(body, card);
+        return cardElement;
+      };
+
+      const createCardBack = () => cardBackTemplate.content.firstElementChild.cloneNode(true);
+
+      const createSuitIcon = (suit, className) => {
+        const icon = suitIconTemplate.content.firstElementChild.cloneNode(true);
+        const use = querySelectorRequired('use', icon);
+        icon.setAttribute('class', `${className} ${className}--${suit}`);
+        use.setAttribute('href', `#sk-${suit}`);
+        return icon;
+      };
+
+      /* State */
+
+      const hands = signal(Array.from({ length: PLAYER_COUNT }, () => []));
+      const trick = signal([]);
+      const turn = signal(null);
+      const calledSuit = signal(null);
+      const isPartnerRevealed = signal(false);
+      const points = signal([0, 0, 0, 0]);
+      const tricksWon = signal([0, 0, 0, 0]);
+      const winningSeat = signal(null);
+      const message = signal('');
+
+      let partnerSeat = null;
+      let dealer = HUMAN;
+      let resolveHumanCard = null;
+
+      const isPlayerTeam = (seat) => seat === HUMAN || seat === partnerSeat;
+
+      const isKnownTeammate = (viewer, other) => {
+        if (viewer === other) {
+          return true;
+        }
+        if (isPartnerRevealed.value || viewer === partnerSeat) {
+          return isPlayerTeam(viewer) === isPlayerTeam(other);
+        }
+        return false;
+      };
+
+      /* Effects */
+
+      const handButtons = new Map();
+
+      const createHandButton = (card) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'c-hand__card';
+        button.setAttribute('aria-label', cardLabel(card));
+        button.append(createCardFront(card));
+        button.addEventListener('click', () => {
+          if (resolveHumanCard === null) {
+            return;
+          }
+          const resolve = resolveHumanCard;
+          resolveHumanCard = null;
+          resolve(card);
+        }, { signal: abortSignal });
+        return button;
+      };
+
+      effect([hands, trick, turn, calledSuit], (allHands, currentTrick, currentTurn, suit) => {
+        const hand = allHands[HUMAN];
+        const isHumanTurn = currentTurn === HUMAN;
+        const legalIds = new Set(isHumanTurn ? legalCards(hand, currentTrick, suit).map((card) => card.id) : []);
+        const handIds = new Set(hand.map((card) => card.id));
+
+        handButtons.forEach((button, id) => {
+          if (handIds.has(id) === false) {
+            button.remove();
+            handButtons.delete(id);
+          }
+        });
+
+        hand.forEach((card, index) => {
+          const button = handButtons.get(card.id) ?? createHandButton(card);
+          const isPlayable = legalIds.has(card.id);
+          handButtons.set(card.id, button);
+          button.style.setProperty('--i', String(index));
+          button.style.setProperty('--n', String(hand.length));
+          button.disabled = isPlayable === false;
+          button.classList.toggle('is-playable', isPlayable);
+          button.classList.toggle('is-blocked', isHumanTurn && isPlayable === false);
+          if (button.isConnected === false) {
+            handElement.append(button);
+          }
+        });
+      });
+
+      const trickCards = new Map();
+
+      effect([trick, winningSeat], (currentTrick, winner) => {
+        const ids = new Set(currentTrick.map((entry) => entry.card.id));
+        trickCards.forEach((element, id) => {
+          if (ids.has(id) === false) {
+            element.remove();
+            trickCards.delete(id);
+          }
+        });
+        currentTrick.forEach((entry) => {
+          const element = trickCards.get(entry.card.id) ?? createCardFront(entry.card);
+          if (trickCards.has(entry.card.id) === false) {
+            element.classList.add('c-trick__card', `c-trick__card--${SEAT_POSITIONS[entry.seat]}`);
+            element.setAttribute('role', 'img');
+            element.setAttribute('aria-label', `${playerName(entry.seat)}: ${cardLabel(entry.card)}`);
+            trickCards.set(entry.card.id, element);
+            trickElement.append(element);
+          }
+          element.classList.toggle('is-winning', entry.seat === winner);
+        });
+      });
+
+      effect([hands, turn, isPartnerRevealed, tricksWon], (allHands, currentTurn, isRevealed, wonTricks) => {
+        seats.forEach(({ seat, element, tricks, badge, cards }) => {
+          element.classList.toggle('is-active', seat === currentTurn);
+          tricks.textContent = format(texts.tricks, { count: wonTricks[seat] });
+          if (badge !== null) {
+            const isPartner = isRevealed && seat === partnerSeat;
+            badge.textContent = isRevealed ? texts[isPartner ? 'partner' : 'opponent'] : '';
+            badge.classList.toggle('is-partner', isPartner);
+          }
+          if (cards !== null && cards.childElementCount !== allHands[seat].length) {
+            cards.replaceChildren(...allHands[seat].map(() => createCardBack()));
+          }
+        });
+      });
+
+      effect([points, isPartnerRevealed], (currentPoints, isRevealed) => {
+        const playerTeamPoints = isRevealed ? currentPoints[HUMAN] + currentPoints[partnerSeat] : currentPoints[HUMAN];
+        scorePlayerLabel.textContent = isRevealed ? texts.scoreTeam : texts.scoreOwn;
+        scoreOtherLabel.textContent = isRevealed ? texts.scoreOpponents : texts.scoreRest;
+        scorePlayerValue.textContent = String(playerTeamPoints);
+        scoreOtherValue.textContent = String(sumBy(currentPoints, (value) => value) - playerTeamPoints);
+      });
+
+      effect([calledSuit, isPartnerRevealed], (suit, isRevealed) => {
+        if (suit === null) {
+          calledElement.replaceChildren('–');
+          partnerElement.replaceChildren('–');
+          return;
+        }
+        calledElement.replaceChildren(
+          createSuitIcon(suit, 'c-hud__icon'),
+          format(texts.calledSau, { suit: texts.suits[suit] }),
+        );
+        partnerElement.replaceChildren(isRevealed ? playerName(partnerSeat) : texts.partnerHidden);
+      });
+
+      effect([message], (text) => {
+        messageElement.textContent = text;
+      });
+
+      seats.forEach(({ seat, name }) => {
+        name.textContent = playerName(seat);
+      });
+
+      /* Computer players */
+
+      const lowestValue = (card) => POINTS[card.rank] * 100 + (isTrump(card) ? 50 + trumpStrength(card) : plainStrength(card));
+
+      const chooseLead = (seat, legal) => {
+        const suit = calledSuit.value;
+        const isSearchingPartnerAce = seat !== partnerSeat && isPartnerRevealed.value === false;
+        const calledSuitCards = legal.filter((card) => effectiveSuit(card) === suit);
+        if (isSearchingPartnerAce && calledSuitCards.length > 0) {
+          return minBy(calledSuitCards, lowestValue);
+        }
+        const aces = legal.filter((card) => card.rank === 'A' && isTrump(card) === false);
+        return aces.length > 0 ? aces[0] : minBy(legal, lowestValue);
+      };
+
+      const chooseComputerCard = (seat) => {
+        const currentTrick = trick.value;
+        const legal = legalCards(hands.value[seat], currentTrick, calledSuit.value);
+        if (legal.length === 1) {
+          return legal[0];
+        }
+        if (currentTrick.length === 0) {
+          return chooseLead(seat, legal);
+        }
+        const leader = trickWinnerEntry(currentTrick);
+        const leadSuit = effectiveSuit(currentTrick[0].card);
+        if (isKnownTeammate(seat, leader.seat)) {
+          return maxBy(legal, (card) => POINTS[card.rank] - (isOberOrUnter(card) ? 10 : 0));
+        }
+        const leaderPower = trickPower(leader.card, leadSuit);
+        const winning = legal.filter((card) => trickPower(card, leadSuit) > leaderPower);
+        return winning.length > 0
+          ? minBy(winning, (card) => trickPower(card, leadSuit))
+          : minBy(legal, lowestValue);
+      };
+
+      /* Game flow */
+
+      const waitForHumanCard = () => new Promise((resolve) => { resolveHumanCard = resolve; });
+
+      const askCalledSuit = (suits) => new Promise((resolve) => {
+        callOptions.replaceChildren(...suits.map((suit) => {
+          const option = callOptionTemplate.content.firstElementChild.cloneNode(true);
+          const iconSlot = querySelectorRequired('.js-call-icon', option);
+          const label = querySelectorRequired('.js-call-label', option);
+          iconSlot.replaceWith(createSuitIcon(suit, 'c-button__icon'));
+          label.textContent = format(texts.calledSau, { suit: texts.suits[suit] });
+          option.addEventListener('click', () => {
+            callDialog.close();
+            resolve(suit);
+          }, { signal: abortSignal });
+          return option;
+        }));
+        callDialog.showModal();
+      });
+
+      const playCard = (seat, card) => {
+        hands.value = hands.value.map((hand, index) => (index === seat ? hand.filter((item) => item !== card) : hand));
+        trick.value = [...trick.value, { seat, card }];
+        if (isCalledAce(card, calledSuit.value)) {
+          isPartnerRevealed.value = true;
+        }
+      };
+
+      const playTurn = async (seat, isLead) => {
+        turn.value = seat;
+        if (seat === HUMAN) {
+          message.value = isLead ? texts.yourLead : texts.yourTurn;
+          return waitForHumanCard();
+        }
+        message.value = format(texts.thinking, { name: playerName(seat) });
+        await sleep(COMPUTER_DELAY_MS);
+        return chooseComputerCard(seat);
+      };
+
+      const playTrick = async (leader) => {
+        for (let step = 0; step < PLAYER_COUNT; step += 1) {
+          const seat = (leader + step) % PLAYER_COUNT;
+          const card = await playTurn(seat, step === 0);
+          playCard(seat, card);
+        }
+        turn.value = null;
+        const winner = trickWinnerEntry(trick.value).seat;
+        const trickPoints = sumBy(trick.value, (entry) => POINTS[entry.card.rank]);
+        winningSeat.value = winner;
+        message.value = winner === HUMAN
+          ? format(texts.trickWonYou, { points: trickPoints })
+          : format(texts.trickWon, { name: playerName(winner), points: trickPoints });
+        await sleep(TRICK_PAUSE_MS);
+        points.value = points.value.map((value, seat) => (seat === winner ? value + trickPoints : value));
+        tricksWon.value = tricksWon.value.map((value, seat) => (seat === winner ? value + 1 : value));
+        winningSeat.value = null;
+        trick.value = [];
+        return winner;
+      };
+
+      const showResult = () => {
+        const finalPoints = points.value;
+        const teamPoints = finalPoints[HUMAN] + finalPoints[partnerSeat];
+        const totalPoints = sumBy(finalPoints, (value) => value);
+        if (totalPoints !== TOTAL_POINTS) {
+          console.error(`Point check failed: ${totalPoints} instead of ${TOTAL_POINTS}`);
+        }
+        resultTitle.textContent = teamPoints >= WIN_THRESHOLD ? texts.won : texts.lost;
+        resultText.textContent = format(texts.resultText, {
+          team: teamPoints,
+          opponents: totalPoints - teamPoints,
+          name: playerName(partnerSeat),
+        });
+        message.value = '';
+        resultDialog.showModal();
+      };
+
+      const resetRound = () => {
+        partnerSeat = null;
+        trick.value = [];
+        turn.value = null;
+        winningSeat.value = null;
+        isPartnerRevealed.value = false;
+        calledSuit.value = null;
+        points.value = [0, 0, 0, 0];
+        tricksWon.value = [0, 0, 0, 0];
+      };
+
+      const dealUntilCallable = async () => {
+        let dealt = dealHands();
+        while (callableSuits(dealt[HUMAN]).length === 0) {
+          hands.value = dealt;
+          message.value = texts.redeal;
+          await sleep(REDEAL_PAUSE_MS);
+          dealt = dealHands();
+        }
+        hands.value = dealt;
+      };
+
+      const playGame = async () => {
+        resetRound();
+        await dealUntilCallable();
+        message.value = texts.callPrompt;
+        const suit = await askCalledSuit(callableSuits(hands.value[HUMAN]));
+        partnerSeat = hands.value.findIndex((hand) => hand.some((card) => isCalledAce(card, suit)));
+        calledSuit.value = suit;
+
+        let leader = (dealer + 1) % PLAYER_COUNT;
+        for (let round = 0; round < HAND_SIZE; round += 1) {
+          leader = await playTrick(leader);
+        }
+        dealer = (dealer + 1) % PLAYER_COUNT;
+        showResult();
+      };
+
+      callDialog.addEventListener('cancel', (event) => event.preventDefault(), { signal: abortSignal });
+      nextGameButton.addEventListener('click', () => {
+        resultDialog.close();
+        playGame();
+      }, { signal: abortSignal });
+
+      playGame();
+    })();
+  </script>
+</body>
+</html>
